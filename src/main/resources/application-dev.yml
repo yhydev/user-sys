@@ -1,0 +1,15 @@
+spring:
+ datasource:
+  type: org.apache.commons.dbcp2.BasicDataSource
+  driver-class-name: com.mysql.jdbc.Driver
+  #url:  jdbc:mysql://devAddress:3306/chat?useUnicode=true&characterEncoding=UTF-8
+  url:  jdbc:mysql://devAddress:3306/usersys?useUnicode=true&characterEncoding=UTF-8
+  username: root
+  password: mysqlpasswd
+ jpa:
+  show-sql: false
+  hibernate.ddl-auto: update
+
+
+redisConfig:
+  address: devAddress
