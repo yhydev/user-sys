@@ -19,7 +19,7 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     }
 
     @Override
-    public ResponseEntity update(String transactionId,String status) {
+    public ResponseEntity update(String transactionId,String status,String remark) {
         return null;
     }
 

@@ -20,7 +20,7 @@ public class Transaction {
     private String status;
     private String userId;
     private Date updateDate;
-    private String message;
+    private String remark;
 
     @Override
     public String toString() {
@@ -32,16 +32,16 @@ public class Transaction {
                 ", status='" + status + '\'' +
                 ", userId='" + userId + '\'' +
                 ", updateDate=" + updateDate +
-                ", message='" + message + '\'' +
+                ", remark='" + remark + '\'' +
                 '}';
     }
 
-    public String getMessage() {
-        return message;
+    public String getRemark() {
+        return remark;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getTransactionId() {

@@ -16,7 +16,7 @@ public interface TransactionService {
 
     ResponseEntity<Transaction> create(String userId,String type,Long money,String status);
 
-    ResponseEntity update(String transactionId,String status);
+    ResponseEntity update(String transactionId,String status,String remark);
 
     ResponseEntity<Page<Transaction>> findByUserId(String userId);
 
