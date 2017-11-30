@@ -16,8 +16,8 @@ public interface TransactionRepository extends JpaRepository<Transaction,String>
     @Query("select sum(money) from Transaction where userId = :userId and status = :status and type = :type")
     Long sumMoneyByUserIdAndStatusAndType(@Param("userId")String userId,@Param("status") String status,@Param("type") String type);
 
-    @Query("update Transaction set status = :status where transactionId = :transactionId")
-    Integer updateStatusByTransactionId(@Param("transactionId") String transactionId,@Param("status") String status);
+    @Query("update Transaction set status = :status,remark = :remark where transactionId = :transactionId")
+    Integer updateStatusByTransactionId(@Param("transactionId") String transactionId,@Param("status") String status,@Param("remark") String remark);
 
     //Integer updateStatusByTransactionIdAndStatus();
 

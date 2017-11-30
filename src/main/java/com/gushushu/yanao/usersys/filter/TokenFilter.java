@@ -11,6 +11,13 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
 import java.io.IOException;
+
+/**
+ * Token 过滤器
+ *
+ * 用来权限控制
+ *
+ */
 @Component
 public class TokenFilter implements Filter,AppConstant {
 

@@ -24,12 +24,12 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     }
 
     @Override
-    public ResponseEntity<Page<Transaction>> findByUserId(String userId) {
+    public ResponseEntity<Page<Transaction>> findByUserId(String userId,int page,int size) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Page<Transaction>> findByStatusAndType(String status, String type) {
+    public ResponseEntity<Page<Transaction>> findByStatusAndType(String status, String type,int page,int size) {
         return null;
     }
 
