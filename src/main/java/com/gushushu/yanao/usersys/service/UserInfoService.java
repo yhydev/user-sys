@@ -1,27 +1,30 @@
 package com.gushushu.yanao.usersys.service;
 
-import com.gushushu.yanao.usersys.common.ResponseBody;
+import org.springframework.http.ResponseEntity;
+
+import com.gushushu.yanao.usersys.entity.UserInfo;
 import com.gushushu.yanao.usersys.model.BankInfo;
 import com.gushushu.yanao.usersys.model.IdInfo;
+import com.gushushu.yanao.usersys.model.UserToken;
 
 public interface UserInfoService {
 
 
 
-    ResponseBody register(String account,String phoneCode,String password);
+    ResponseEntity<UserInfo> register(String account,String phoneCode,String password);
 
-    ResponseBody login(String account,String password);
+    ResponseEntity<UserToken> login(String account,String password);
 
-    ResponseBody findPassword(String account,String phoneCode,String password);
+    ResponseEntity<UserInfo> findPassword(String account,String phoneCode,String password);
 
-    ResponseBody updatePassword(String userId,String password,String newPassword);
+    ResponseEntity<UserInfo> updatePassword(String userId,String password,String newPassword);
 
-    ResponseBody updateEmail(String userId, String password,String email);
+    ResponseEntity<UserInfo> updateEmail(String userId, String password,String email);
 
-    ResponseBody update(String userId,BankInfo bankInfo, IdInfo idInfo);
+    ResponseEntity<UserInfo> update(String userId,BankInfo bankInfo, IdInfo idInfo);
 
-    ResponseBody updateMoney(String userId,Long money);
+    ResponseEntity<UserInfo> updateMoney(String userId,Long money);
 
-    ResponseBody updateOuterDiscAccount(String userId,String outerDiscAccount);
+    ResponseEntity<UserInfo> updateOuterDiscAccount(String userId,String outerDiscAccount);
 
 }

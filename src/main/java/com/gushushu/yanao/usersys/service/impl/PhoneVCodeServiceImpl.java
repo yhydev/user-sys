@@ -2,12 +2,16 @@ package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.cache.ObjectCache;
 import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
+import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.PhoneVCode;
 import com.gushushu.yanao.usersys.model.PhoneVCodeCache;
 import com.gushushu.yanao.usersys.repository.PhoneVCodeRepository;
 import com.gushushu.yanao.usersys.service.PhoneVCodeService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,7 +21,7 @@ import java.util.Properties;
 import java.util.Random;
 
 @Service
-public class PhoneVCodeServiceImpl implements PhoneVCodeService {
+public class PhoneVCodeServiceImpl implements PhoneVCodeService,AppConstant {
 
     final static Logger logger = Logger.getLogger(PhoneVCodeServiceImpl.class);
 
@@ -45,7 +49,7 @@ public class PhoneVCodeServiceImpl implements PhoneVCodeService {
     //final static long timeout = 60 * 1000 * 5;
 
 
-    public ResponseBody send(String phone,String type) {
+    public ResponseEntity<PhoneVCode> send(String phone,String type) {
 
 
         logger.info("----Method:\tsend----");
@@ -58,7 +62,7 @@ public class PhoneVCodeServiceImpl implements PhoneVCodeService {
         if(limit == null){
             String errmsg = "invalid type";
             logger.warn(errmsg);
-            rb.error(errmsg);
+            return new ResponseEntityBuilder<PhoneVCode>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
         }else{
             Random random = new Random();
             String code = String.valueOf(random.nextInt(999999));
@@ -87,30 +91,19 @@ public class PhoneVCodeServiceImpl implements PhoneVCodeService {
 
                 //TODO SMS 发送验证码
 
-                rb.success(verificationCode);
+                return new ResponseEntity<PhoneVCode>(verificationCode, HttpStatus.OK);
+            }else{
+            	return new ResponseEntityBuilder<PhoneVCode>().builder(HttpStatus.BAD_REQUEST, ERROR, "信息发送失败");
             }
-
-
-
         }
-
-
-        return rb;
     }
 
-
-
-
-    public ResponseBody validateCode(String phone,String type, String code) {
+    public ResponseEntity<PhoneVCode> validateCode(String phone,String type, String code) {
 
         logger.info("----Method:\tvalidateCode----");
         logger.info("param:\t phone\t"+phone);
         logger.info("param:\t type\t" + type);
         logger.info("param:\t code\t"+code);
-
-
-        ResponseBody rb = new ResponseBody();
-
 
         PhoneVCodeCache verificationCodeCache = new PhoneVCodeCache();
         verificationCodeCache.setPhone(phone);
@@ -120,14 +113,11 @@ public class PhoneVCodeServiceImpl implements PhoneVCodeService {
 
         if(verificationCodeCache == null || !code.equals(verificationCodeCache.getCode())){
             String errmsg = "验证码无效";
-            rb.error(errmsg);
             logger.warn(errmsg);
+            return new ResponseEntityBuilder<PhoneVCode>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg); 
         }else{
-            rb.success();
+            return new ResponseEntity<PhoneVCode>(HttpStatus.OK);
         }
-
-
-        return rb;
     }
 
 
