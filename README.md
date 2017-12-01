@@ -19,4 +19,11 @@
 - 修改所有 Controller 返回类型为：
 [org.springframework.http.ResponseEntity](http://blog.csdn.net/u012733415/article/details/78667927)。
 
- 
+- 完成 Transaction Controller 层
+    + 充值
+    + 外盘入金
+    + 外盘出金
+    + 提现
+    + 审核入金
+    + 审核出金
+    + 审核提现
