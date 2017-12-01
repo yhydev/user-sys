@@ -4,12 +4,14 @@ import com.gushushu.yanao.usersys.common.ResponseBody;
 
 import java.awt.image.BufferedImage;
 
+import org.springframework.http.ResponseEntity;
+
 public interface ImageVCodeService {
 
-    ResponseBody<BufferedImage> create(String session);
+    ResponseEntity<BufferedImage> create(String session);
 
 
-    ResponseBody validate(String session,String imageCode);
+    ResponseEntity<BufferedImage> validate(String session,String imageCode);
 
 
 

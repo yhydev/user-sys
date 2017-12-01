@@ -4,10 +4,14 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.gushushu.yanao.usersys.cache.ObjectCache;
 import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
+import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.model.ImageVCodeCache;
 import com.gushushu.yanao.usersys.service.ImageVCodeService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
@@ -19,7 +23,7 @@ import java.util.Random;
 
 
 @Service
-public class ImageVCodeServiceImpl implements ImageVCodeService {
+public class ImageVCodeServiceImpl implements ImageVCodeService,AppConstant {
 
     @Autowired
     private ObjectCache objectCache;
@@ -41,11 +45,10 @@ public class ImageVCodeServiceImpl implements ImageVCodeService {
     static final Logger logger = Logger.getLogger(ImageVCodeServiceImpl.class);
 
     @Override
-    public ResponseBody<BufferedImage> create(String session) {
+    public ResponseEntity<BufferedImage> create(String session) {
 
         logger.info("------Method:\tImageVCodeServiceImpl.create-------");
         logger.info("session = [" + session + "]");
-        ResponseBody rb = new ResponseBody();
 
         String code = kaptcha.createText();
         ImageVCodeCache imageVCodeCache = new ImageVCodeCache();
@@ -57,21 +60,16 @@ public class ImageVCodeServiceImpl implements ImageVCodeService {
 
         BufferedImage bufferedImage =  kaptcha.createImage(String.valueOf(code));
 
-        rb.success(bufferedImage);
-
-
-
-        return rb;
+        return new ResponseEntity<BufferedImage>(bufferedImage, HttpStatus.OK);
     }
 
     @Override
-    public ResponseBody validate(String session, String imageCode) {
+    public ResponseEntity<BufferedImage> validate(String session, String imageCode) {
 
         //instance.validateResponseForID(session,imageCode);
 
         logger.info("-------Method:\tImageVCodeServiceImpl.validate------");
         logger.info("session = [" + session + "], imageCode = [" + imageCode + "]");
-        ResponseBody rb = new ResponseBody();
 
         ImageVCodeCache imageVCodeCache = new ImageVCodeCache();
         imageVCodeCache.setSession(session);
@@ -79,19 +77,15 @@ public class ImageVCodeServiceImpl implements ImageVCodeService {
         imageVCodeCache = (ImageVCodeCache) objectCache.get(imageVCodeCache);
         if(imageVCodeCache == null){
             String errmsg = "invalid session";
-            rb.error(errmsg);
             logger.warn(errmsg);
+            return new ResponseEntityBuilder<BufferedImage>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
         }else if(!imageVCodeCache.getImageCode().equals(imageCode)){
             String errmsg = "图形验证码错误";
-            rb.error(errmsg);
             logger.warn(errmsg);
+            return new ResponseEntityBuilder<BufferedImage>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
         }else{
             objectCache.del(imageVCodeCache);
-            rb.success();
+            return new ResponseEntity<BufferedImage>(HttpStatus.OK);
         }
-
-
-
-        return rb;
     }
 }

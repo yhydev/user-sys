@@ -1,9 +1,11 @@
 package com.gushushu.yanao.usersys.controller;
 
-import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.config.AppConstant;
+import com.gushushu.yanao.usersys.entity.UserInfo;
+import com.gushushu.yanao.usersys.model.UserToken;
 import com.gushushu.yanao.usersys.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,32 +16,32 @@ public class UserController implements AppConstant {
     private UserInfoService userInfoService;
 
     @PostMapping("register")
-    public ResponseBody register(String account,String password,String phoneCode){
+    public ResponseEntity<UserInfo> register(String account,String password,String phoneCode){
         return userInfoService.register(account,phoneCode,password);
     }
 
     @PostMapping("login")
-    public ResponseBody login(String account,String password){
+    public ResponseEntity<UserToken> login(String account,String password){
         return userInfoService.login(account,password);
     }
 
     @PostMapping("updatePassword")
-    public ResponseBody updatePassword(String userId,String password,String newPassword){
+    public ResponseEntity<UserInfo> updatePassword(String userId,String password,String newPassword){
         return userInfoService.updatePassword(userId, password, newPassword);
     }
 
     @PostMapping("updateEmail")
-    public ResponseBody updateEmail(String userId,String password,String email){
+    public ResponseEntity<UserInfo> updateEmail(String userId,String password,String email){
         return userInfoService.updateEmail(userId, password, email);
     }
 
 
     @PostMapping("findPassword")
-    public ResponseBody findPassword(String account,String password,String phoneCode){
+    public ResponseEntity<UserInfo> findPassword(String account,String password,String phoneCode){
         return userInfoService.findPassword(account, phoneCode, password);
     }
     @PostMapping("updateOuterDiscAccount")
-    public ResponseBody updateOuterDiscAccount(String userId,String outerDiscAccount){
+    public ResponseEntity<UserInfo> updateOuterDiscAccount(String userId,String outerDiscAccount){
         return userInfoService.updateOuterDiscAccount(userId,outerDiscAccount);
     }
 
