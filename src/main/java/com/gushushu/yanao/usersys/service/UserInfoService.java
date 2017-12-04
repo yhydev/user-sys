@@ -1,5 +1,6 @@
 package com.gushushu.yanao.usersys.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import com.gushushu.yanao.usersys.entity.UserInfo;
@@ -26,5 +27,7 @@ public interface UserInfoService {
     ResponseEntity<UserInfo> updateMoney(String userId,Long money);
 
     ResponseEntity<UserInfo> updateOuterDiscAccount(String userId,String outerDiscAccount);
+
+    ResponseEntity<Page> find(String proxyUserId,int page,int size);
 
 }
