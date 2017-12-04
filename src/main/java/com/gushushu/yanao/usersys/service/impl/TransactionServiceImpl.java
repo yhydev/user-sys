@@ -3,6 +3,7 @@ package com.gushushu.yanao.usersys.service.impl;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.Transaction;
+import com.gushushu.yanao.usersys.entity.UserInfo;
 import com.gushushu.yanao.usersys.repository.TransactionRepository;
 import com.gushushu.yanao.usersys.service.TransactionService;
 import com.gushushu.yanao.usersys.service.UserInfoService;
@@ -46,8 +47,22 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     	logger.info("money="+money);
     	logger.info("status="+status);
     	
-    	if(!WAIT_CHECK_STATUS.equals(status) && !STRING_WAIT_PAY.equals(status)){
-    		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "状态错误");
+    	if(STRING_SUCCESS.equals(status) || money < 0){
+    		ResponseEntity<UserInfo> RE = userInfoService.updateMoney(userId, money);
+    		if(RE.getStatusCode() == HttpStatus.OK){
+    			Transaction tran = new Transaction();
+            	tran.setCreateDate(new Date());
+            	tran.setMoney(money);
+            	tran.setStatus(status);
+            	tran.setType(type);
+            	tran.setUserId(userId);
+            	transactionRepository.save(tran);
+            	
+            	//TODO 发送信息 
+                return new ResponseEntity<Transaction>(HttpStatus.OK);
+    		}else{
+    			return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "余额不足");
+    		}
     	}else{
     		Transaction tran = new Transaction();
         	tran.setCreateDate(new Date());
@@ -56,10 +71,6 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
         	tran.setType(type);
         	tran.setUserId(userId);
         	transactionRepository.save(tran);
-        	
-        	if(TRANSACTION_TYPE_INMONEY.equals(type) || TRANSACTION_TYPE_WITHDRAWALS.equals(type)){
-        		userInfoService.updateMoney(userId, money);
-        	}
         	
         	//TODO 发送信息 （此处应考虑充值时，未支付成功之前不发送短信）
             return new ResponseEntity<Transaction>(HttpStatus.OK);
@@ -75,26 +86,29 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     	logger.info("remark="+remark);
     	
     	Transaction t =transactionRepository.findOne(transactionId);
+    	if(null == t){
+    		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "未查到交易记录");
+    	}
     	if(STRING_SUCCESS.equals(t.getStatus()) || STRING_FAILED.equals(t.getStatus())){
     		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "状态错误");
     	}
 
-    	Integer tem = transactionRepository.updateStatusByTransactionId(transactionId, status, remark);
-    	
-    	if(tem != 1){
-    		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "未查到交易记录");
-    	}else{
-    		if(((TRANSACTION_TYPE_RECHARGE.equals(t.getType()) || TRANSACTION_TYPE_OUTMONEY.equals(t.getType())) && STRING_SUCCESS.equals(status))){
-    			userInfoService.updateMoney(t.getUserId(), t.getMoney());
-    		}
-    		
-    		if((TRANSACTION_TYPE_INMONEY.equals(t.getType()) || TRANSACTION_TYPE_WITHDRAWALS.equals(t.getType())) && STRING_FAILED.equals(status)){
-    			userInfoService.updateMoney(t.getUserId(), -t.getMoney());
-    		}
-    		
-    		//TODO 发送信息
-    		return new ResponseEntity<Transaction>(HttpStatus.OK);
-    	}
+    	ResponseEntity<UserInfo>  REUser = null;
+		if(t.getMoney() > 0 && STRING_SUCCESS.equals(status)){
+			REUser = userInfoService.updateMoney(t.getUserId(), t.getMoney());
+		}
+		
+		if(t.getMoney() < 0 && STRING_FAILED.equals(status)){
+			REUser = userInfoService.updateMoney(t.getUserId(), -t.getMoney());
+		}
+		
+		if(null != REUser && (REUser.getStatusCode() == HttpStatus.OK)){
+			transactionRepository.updateStatusByTransactionId(transactionId, status, remark);
+			//TODO 发送信息
+			return new ResponseEntity<Transaction>(HttpStatus.OK);
+		}else{
+			return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "余额不足");
+		}
     }
 
     @Override
