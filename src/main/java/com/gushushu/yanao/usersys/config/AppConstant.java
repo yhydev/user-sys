@@ -29,11 +29,11 @@ public interface AppConstant {
   
   static final String TRANSACTION_TYPE_RECHARGE ="recharge";	//充值
   
-  static final String ERROR_TYPE_INMONEY ="inmoney";			//入金
+  static final String TRANSACTION_TYPE_INMONEY ="inmoney";			//入金
   
-  static final String ERROR_TYPE_OUTMONEY="outmoney";			//出金
+  static final String TRANSACTION_TYPE_OUTMONEY="outmoney";			//出金
   
-  static final String ERROR_TYPE_WITHDRAWALS="withdrawals";		//提现
+  static final String TRANSACTION_TYPE_WITHDRAWALS="withdrawals";		//提现
 
     /*static final String register = "register";
     static final String login = "login";

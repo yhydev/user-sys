@@ -21,7 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * 交易模块Service
+ * @author 57403
+ *
+ */
 @Service
 public class TransactionServiceImpl implements TransactionService,AppConstant {
 
@@ -53,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
         	tran.setUserId(userId);
         	transactionRepository.save(tran);
         	
-        	if(ERROR_TYPE_INMONEY.equals(type) || ERROR_TYPE_WITHDRAWALS.equals(type)){
+        	if(TRANSACTION_TYPE_INMONEY.equals(type) || TRANSACTION_TYPE_WITHDRAWALS.equals(type)){
         		userInfoService.updateMoney(userId, money);
         	}
         	
@@ -80,11 +84,11 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     	if(tem != 1){
     		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "未查到交易记录");
     	}else{
-    		if(((TRANSACTION_TYPE_RECHARGE.equals(t.getType()) || ERROR_TYPE_OUTMONEY.equals(t.getType())) && STRING_SUCCESS.equals(status))){
+    		if(((TRANSACTION_TYPE_RECHARGE.equals(t.getType()) || TRANSACTION_TYPE_OUTMONEY.equals(t.getType())) && STRING_SUCCESS.equals(status))){
     			userInfoService.updateMoney(t.getUserId(), t.getMoney());
     		}
     		
-    		if((ERROR_TYPE_INMONEY.equals(t.getType()) || ERROR_TYPE_WITHDRAWALS.equals(t.getType())) && STRING_FAILED.equals(status)){
+    		if((TRANSACTION_TYPE_INMONEY.equals(t.getType()) || TRANSACTION_TYPE_WITHDRAWALS.equals(t.getType())) && STRING_FAILED.equals(status)){
     			userInfoService.updateMoney(t.getUserId(), -t.getMoney());
     		}
     		
