@@ -63,9 +63,8 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     }
 
 	@Transactional
-    @SuppressWarnings("rawtypes")
 	@Override
-    public ResponseEntity update(String transactionId,String status,String remark) {
+    public ResponseEntity<Transaction> update(String transactionId,String status,String remark) {
     	logger.info("-----TransactionServiceImpl/update-----");
     	logger.info("transactionId="+transactionId);
     	logger.info("status="+status);

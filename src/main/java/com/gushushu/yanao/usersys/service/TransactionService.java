@@ -1,11 +1,9 @@
 package com.gushushu.yanao.usersys.service;
 
-import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 
 public interface TransactionService {
 
@@ -16,7 +14,7 @@ public interface TransactionService {
 
     ResponseEntity<Transaction> create(String userId,String type,Long money,String status);
 
-    ResponseEntity update(String transactionId,String status,String remark);
+    ResponseEntity<Transaction> update(String transactionId,String status,String remark);
 
     ResponseEntity<Page<Transaction>> findByUserId(String userId,int page,int size);
 
