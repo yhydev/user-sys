@@ -5,44 +5,33 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Date;
 @Entity
-public class UserInfo {
+public class Member {
 
 
     @Id
     @GenericGenerator(name = "uuid",strategy = "uuid")
     @GeneratedValue(generator = "uuid")
-    private String userId;
+    private String memberId;
     private String account;//账户 (手机号)
     private String password;//密码
-    private String phone;//手机号
-
     private Date createDate;// 创建日期
-    private String type;//类型 未启用
+    private String type;//类型
     private String status;//状态 未启动
-    private String id;//身份证
+    private String identityCard;//身份证
     private String name;// 姓名
     private Long balance;//余额（分）
     private String email;//邮箱
     private String bankCardNo;//银行卡
     private String bankName;//银行卡名称
-    private String outerDiscAccount;//外盘账户
+    private String innerDiscAccount;//内盘账户
 
-    public String getOuterDiscAccount() {
-        return outerDiscAccount;
+
+    public String getMemberId() {
+        return memberId;
     }
 
-
-
-    public void setOuterDiscAccount(String outerDiscAccount) {
-        this.outerDiscAccount = outerDiscAccount;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
     }
 
     public String getAccount() {
@@ -59,14 +48,6 @@ public class UserInfo {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public Date getCreateDate() {
@@ -93,12 +74,12 @@ public class UserInfo {
         this.status = status;
     }
 
-    public String getId() {
-        return id;
+    public String getIdentityCard() {
+        return identityCard;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIdentityCard(String identityCard) {
+        this.identityCard = identityCard;
     }
 
     public String getName() {
@@ -141,25 +122,11 @@ public class UserInfo {
         this.bankName = bankName;
     }
 
-
-    @Override
-    public String toString() {
-        return "UserInfo{" +
-                "userId='" + userId + '\'' +
-                ", account='" + account + '\'' +
-                ", password='" + password + '\'' +
-                ", phone='" + phone + '\'' +
-                ", createDate=" + createDate +
-                ", type='" + type + '\'' +
-                ", status='" + status + '\'' +
-                ", id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", balance=" + balance +
-                ", email='" + email + '\'' +
-                ", bankCardNo='" + bankCardNo + '\'' +
-                ", bankName='" + bankName + '\'' +
-                ", outerDiscAccount='" + outerDiscAccount + '\'' +
-                '}';
+    public String getInnerDiscAccount() {
+        return innerDiscAccount;
     }
 
+    public void setInnerDiscAccount(String innerDiscAccount) {
+        this.innerDiscAccount = innerDiscAccount;
+    }
 }

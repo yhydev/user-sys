@@ -1,3 +1,4 @@
+/*
 package com.gushushu.yanao.usersys.factory;
 
 import org.junit.Test;
@@ -15,4 +16,4 @@ public class TransactionStatusFactoryTest {
 
     }
 
-}
+}*/

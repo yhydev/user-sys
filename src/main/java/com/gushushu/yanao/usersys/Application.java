@@ -1,7 +1,5 @@
 package com.gushushu.yanao.usersys;
 
-import com.gushushu.yanao.usersys.config.RedisConfig;
-import com.gushushu.yanao.usersys.filter.TokenFilter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -23,7 +21,7 @@ public class Application {
         SpringApplication.run(Application.class,arg);
     }
 
-    @Bean
+  /*  @Bean
     public FilterRegistrationBean tokenFilterBean(@Autowired TokenFilter tokenFilter){
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(tokenFilter);
         filterRegistrationBean.addUrlPatterns("/*");
@@ -64,7 +62,7 @@ public class Application {
     }
 
 
-
+*/
 
 
 }

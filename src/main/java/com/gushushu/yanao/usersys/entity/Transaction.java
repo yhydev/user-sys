@@ -2,9 +2,7 @@ package com.gushushu.yanao.usersys.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -18,31 +16,12 @@ public class Transaction {
     private String type;
     private Date createDate;
     private String status;
-    private String userId;
+
+    @OneToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
     private Date updateDate;
     private String remark;
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "transactionId='" + transactionId + '\'' +
-                ", money=" + money +
-                ", type='" + type + '\'' +
-                ", createDate=" + createDate +
-                ", status='" + status + '\'' +
-                ", userId='" + userId + '\'' +
-                ", updateDate=" + updateDate +
-                ", remark='" + remark + '\'' +
-                '}';
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
 
     public String getTransactionId() {
         return transactionId;
@@ -84,12 +63,12 @@ public class Transaction {
         this.status = status;
     }
 
-    public String getUserId() {
-        return userId;
+    public Member getMember() {
+        return member;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     public Date getUpdateDate() {
@@ -98,5 +77,27 @@ public class Transaction {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "transactionId='" + transactionId + '\'' +
+                ", money=" + money +
+                ", type='" + type + '\'' +
+                ", createDate=" + createDate +
+                ", status='" + status + '\'' +
+                ", member=" + member +
+                ", updateDate=" + updateDate +
+                ", remark='" + remark + '\'' +
+                '}';
     }
 }

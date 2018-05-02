@@ -8,31 +8,31 @@ import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
-public class PhoneVCode {
+public class IdentifyingCode {
 
     @Id
     @GenericGenerator(name = "uuid",strategy = "uuid")
     @GeneratedValue(generator = "uuid")
-    private String verificationCodeId;//验证码Id
-    private String code;//代码(验证码)
-    private String type;// (保留，未使用)
-    private String status;// (保留，未使用)
+    private String identifyingCodeId;//验证码Id
+    private Integer code;//代码(验证码)
+    private String type;//
+    private String status;//
     private Date createDate;//创建日期
     private String phone;//手机号
 
-    public String getVerificationCodeId() {
-        return verificationCodeId;
+    public String getIdentifyingCodeId() {
+        return identifyingCodeId;
     }
 
-    public void setVerificationCodeId(String verificationCodeId) {
-        this.verificationCodeId = verificationCodeId;
+    public void setIdentifyingCodeId(String identifyingCodeId) {
+        this.identifyingCodeId = identifyingCodeId;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 
@@ -70,9 +70,9 @@ public class PhoneVCode {
 
     @Override
     public String toString() {
-        return "PhoneVCode{" +
-                "verificationCodeId='" + verificationCodeId + '\'' +
-                ", code='" + code + '\'' +
+        return "IdentifyingCode{" +
+                "identifyingCodeId='" + identifyingCodeId + '\'' +
+                ", code=" + code +
                 ", type='" + type + '\'' +
                 ", status='" + status + '\'' +
                 ", createDate=" + createDate +

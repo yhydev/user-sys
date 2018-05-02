@@ -3,13 +3,10 @@ spring:
   type: org.apache.commons.dbcp2.BasicDataSource
   driver-class-name: com.mysql.jdbc.Driver
   #url:  jdbc:mysql://devAddress:3306/chat?useUnicode=true&characterEncoding=UTF-8
-  url:  jdbc:mysql://devAddress:3306/usersys?useUnicode=true&characterEncoding=UTF-8
+  url:  jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8
   username: root
-  password: mysqlpasswd
+  password: 12qw@#QW
  jpa:
-  show-sql: false
+  show-sql: true
   hibernate.ddl-auto: update
 
-
-redisConfig:
-  address: devAddress

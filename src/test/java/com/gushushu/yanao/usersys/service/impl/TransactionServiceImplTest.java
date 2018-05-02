@@ -1,17 +1,10 @@
+/*
 package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.Application;
-import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.PhoneVCode;
-import com.gushushu.yanao.usersys.entity.Transaction;
 import com.gushushu.yanao.usersys.entity.UserInfo;
-import com.gushushu.yanao.usersys.model.UserToken;
-import com.gushushu.yanao.usersys.repository.UserInfoRepository;
-import com.gushushu.yanao.usersys.service.TransactionService;
-import com.gushushu.yanao.usersys.service.UserInfoService;
-import com.gushushu.yanao.usersys.service.PhoneVCodeService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,4 +32,4 @@ public class TransactionServiceImplTest implements AppConstant{
 		//transactionServiceImpl.findByStatusAndType(STRING_WAIT_CHECK, TRANSACTION_TYPE_RECHARGE, 0, 5);
 	}
 	
-}
+}*/

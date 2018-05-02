@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TransactionRepository extends JpaRepository<Transaction,String> {
+/*
 
     Page<Transaction> findByUserId(String userId, Pageable pageable);
 
@@ -21,6 +22,7 @@ public interface TransactionRepository extends JpaRepository<Transaction,String>
     @Modifying
     @Query("update Transaction set status = :status,remark = :remark where transactionId = :transactionId")
     Integer updateStatusByTransactionId(@Param("transactionId") String transactionId,@Param("status") String status,@Param("remark") String remark);
+*/
 
     //Integer updateStatusByTransactionIdAndStatus();
 
