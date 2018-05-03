@@ -1,6 +1,7 @@
 package com.gushushu.yanao.usersys.service;
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.common.SecretEncode;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
 import org.apache.tomcat.util.security.MD5Encoder;
@@ -72,7 +73,7 @@ public interface MemberService {
         }
 
         public void setPassword(String password) {
-            this.password = MD5Encoder.encode(password.getBytes());
+            this.password = SecretEncode.md5(password);
         }
 
         @Override

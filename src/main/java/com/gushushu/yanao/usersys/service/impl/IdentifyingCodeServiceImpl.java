@@ -59,11 +59,11 @@ public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppCon
             identifyingCode.setPhone(sendParam.phone);
             identifyingCode.setType(sendParam.type);
             identifyingCode.setCreateDate(new Date());
-            identifyingCode.setStatus(UNVERIFIED);
+            identifyingCode.setStatus(UNVERIFIED_STATUS);
 
             identifyingCodeRepository.save(identifyingCode);
             //TODO 发送验证码接口调用
-            response = new ResponseEntityBuilder().success(null);
+            response = new ResponseEntityBuilder().success(identifyingCode.getIdentifyingCodeId());
 
         }else {
             response = new ResponseEntityBuilder().failed("一分钟只能发送一条验证码");
@@ -81,10 +81,10 @@ public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppCon
         logger.info("param = [" + param + "]");
         ResponseEntity response = null;
 
-        IdentifyingCode code = identifyingCodeRepository.findCode(param.phone,param.type,UNVERIFIED,param.code);
+        IdentifyingCode code = identifyingCodeRepository.findCode(param.phone,param.type,UNVERIFIED_STATUS,param.code);
 
         if(code != null){
-            code.setStatus(VERIFIED);
+            code.setStatus(VERIFIED_STATUS);
             identifyingCodeRepository.save(code);
             response = new ResponseEntityBuilder().success(null);
         }else{

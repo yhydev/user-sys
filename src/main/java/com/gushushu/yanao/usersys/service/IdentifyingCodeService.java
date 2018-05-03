@@ -16,7 +16,12 @@ public interface IdentifyingCodeService {
 
 	public static final String VERIFIED_STATUS = "verified";
 
-	ResponseEntity send(SendParam sendParam);
+	/**
+	 * it send sms code
+	 * @param sendParam
+	 * @return if isSuccess is true of responseBody, data of it is  identifyingCodeId
+	 */
+	ResponseEntity<ResponseBody<String>> send(SendParam sendParam);
 
 	ResponseEntity<ResponseBody<IdentifyingCode>> validate(ValidateParam validateParam);
 
