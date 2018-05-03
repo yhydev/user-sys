@@ -1,6 +1,7 @@
 package com.gushushu.yanao.usersys.service;
 
 
+import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import org.springframework.http.ResponseEntity;
 
@@ -11,9 +12,13 @@ public interface IdentifyingCodeService {
 
 	public final static Random random = new Random();
 
+	public static final String UNVERIFIED_STATUS = "Unverified";
+
+	public static final String VERIFIED_STATUS = "verified";
+
 	ResponseEntity send(SendParam sendParam);
 
-	ResponseEntity<IdentifyingCode> validate(ValidateParam validateParam);
+	ResponseEntity<ResponseBody<IdentifyingCode>> validate(ValidateParam validateParam);
 
 
 

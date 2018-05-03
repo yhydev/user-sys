@@ -1,15 +1,15 @@
 package com.gushushu.yanao.usersys.service.impl;
 
-import com.gushushu.yanao.usersys.common.RandomUtils;
+import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.common.SecretEncode;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import com.gushushu.yanao.usersys.entity.Member;
-import com.gushushu.yanao.usersys.model.BankInfo;
-import com.gushushu.yanao.usersys.model.IdInfo;
+import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
+import com.gushushu.yanao.usersys.service.MemberSessionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,11 +26,7 @@ public class MemberServiceImpl implements MemberService {
 
     final static Logger logger = Logger.getLogger(MemberServiceImpl.class);
 
-    //注册验证码类型
-    final static String REGISTER_VERIFICATION_CODE = "register";
 
-    //找回密码验证码类型
-    final static String FIND_PASSWORD_VERIFICATION_CODE = "findPassword";
 
 
     //用户token 超时时间(单位秒)
@@ -41,67 +37,81 @@ public class MemberServiceImpl implements MemberService {
     private MemberRepository MemberRepository;
 
     @Autowired
+    private MemberSessionService memberSessionService;
+
+    @Autowired
     private IdentifyingCodeService identifyingCodeService;
 
-    public ResponseEntity<Member> register(String account, String code, String password) {
 
-        logger.info("-----Method:\tRegister----");
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseBody<MemberSession>> register(RegisterParam param) {
 
-        logger.info("param:\taccount:\t"+account);
-        logger.info("param:\tcode:\t"+code);
-        logger.info("param:\tpassword:\t"+password);
+        logger.info("param = [" + param + "]");
 
-        ResponseEntity<IdentifyingCode> smsRE = identifyingCodeService.validate(account,REGISTER_VERIFICATION_CODE,code);
+        ResponseEntity<ResponseBody<MemberSession>> response = null;
+
+        //验证码 验证
+        IdentifyingCodeService.ValidateParam validateParam = new IdentifyingCodeService.ValidateParam();
+        validateParam.type = "register";
+        validateParam.phone = param.getAccount();
+        validateParam.code = param.getPhoneCode();
+
+        ResponseEntity<ResponseBody<IdentifyingCode>> responseEntity = identifyingCodeService.validate(validateParam);
+
         //验证码是否正确
-        if(smsRE.getStatusCode() == HttpStatus.OK){
+        if(responseEntity.getBody().isSuccess()){
 
-            Long accountCount = MemberRepository.countByAccount(account);
+            Long accountCount = MemberRepository.countByAccount(param.getAccount());
 
             if(accountCount != 0){
+
+                //验证码错误
                 String errmsg = "此手机号已被注册.";
-                logger.warn(errmsg);
-                return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
+                response = ResponseEntityBuilder.failed(errmsg);
             }else{
-                Member Member = new Member();
-                Member.setCreateDate(new Date());
-                Member.setPassword(SecretEncode.md5(password));
-                Member.setAccount(account);
-                Member.setBalance(0L);
-                MemberRepository.save(Member);
-                
-                return new ResponseEntity<Member>(HttpStatus.OK);
+
+                //验证码正确
+
+                Member member = new Member();
+                member.setCreateDate(new Date());
+                member.setPassword(param.getPassword());
+                member.setAccount(param.getAccount());
+                member.setBalance(0L);
+                MemberRepository.save(member);
+
+                memberSessionService.saveSession(member.getMemberId());
+
             }
         }else{
-        	return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, "验证码错误");
+            response = ResponseEntityBuilder.failed(responseEntity.getBody().getMessage());
         }
+
+        logger.info("response = " + response);
+
+        return response;
     }
 
-    public ResponseEntity<UserToken> login(String account, String password) {
+    @Override
+    public ResponseEntity<ResponseBody<MemberSession>> login(LoginParam loginParam) {
 
-        logger.info("-----Method:\tlogin----");
-        logger.info("param:\taccount:\t"+account);
-        logger.info("param:\tpassword:\t"+password);
+        logger.info("loginParam = [" + loginParam + "]");
 
-        Member Member = MemberRepository.findByAccount(account);
-        String encodePassword = SecretEncode.md5(password);
+        ResponseEntity<ResponseBody<MemberSession>> response = null;
 
-        if(Member != null && encodePassword.equals(Member.getPassword())){
+        String memberId = MemberRepository.findId(loginParam.getAccount(),loginParam.getPassword());
 
-            String token = RandomUtils.generate();
-
-            UserToken userToken = new UserToken();
-            userToken.setUserId(Member.getUserId());
-            userToken.setToken(token);
-            objectCache.set(userToken,USER_TOKEN_TIMEOUT);
-            
-            return new ResponseEntity<UserToken>(userToken, HttpStatus.OK);
+        if(memberId == null){
+            response = ResponseEntityBuilder.failed("账号或密码错误.");
         }else{
-            String errmsg = "账号或密码错误";
-            logger.warn(errmsg);
-            
-            return new ResponseEntityBuilder<UserToken>().builder(HttpStatus.BAD_REQUEST, ERROR,errmsg);
+            response = memberSessionService.saveSession(memberId);
         }
+
+        logger.info("response = " + response);
+
+        return response;
     }
+/*
 
     @Transactional
     public ResponseEntity<Member> findPassword(String account, String phoneCode, String password) {
@@ -282,6 +292,8 @@ public class MemberServiceImpl implements MemberService {
             return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, "错误");
         }
     }
+*/
+
 
 
 }

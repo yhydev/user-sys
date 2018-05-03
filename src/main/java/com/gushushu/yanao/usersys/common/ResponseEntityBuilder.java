@@ -18,40 +18,21 @@ public class ResponseEntityBuilder<T> {
     }
 
 
-    public ResponseEntity<ResponseBody<T>> success(T data){
+    public static <T> ResponseEntity<ResponseBody<T>> success(T data){
         ResponseBody<T> responseBody = new ResponseBody<T>();
-        responseBody.status = 1;
-        responseBody.data = data;
+        responseBody.setStatus( 1);
+        responseBody.setData(data);
         return new ResponseEntity<ResponseBody<T>>(responseBody,HttpStatus.OK);
     }
 
-    public ResponseEntity<ResponseBody<T>> failed(String msg){
+    public static <T> ResponseEntity<ResponseBody<T>> failed(String msg){
         ResponseBody<T> responseBody = new ResponseBody<T>();
-        responseBody.status = -1;
-        responseBody.message = msg;
+        responseBody.setStatus(-1);
+        responseBody.setMessage(msg);
         return new ResponseEntity<ResponseBody<T>>(responseBody,HttpStatus.OK);
     }
 
 
-    public static class ResponseBody<C>{
-        private Integer status;
-        private C data;
-        private String message;
-
-        @Override
-        public String toString() {
-            return "ResponseBody{" +
-                    "status='" + status + '\'' +
-                    ", data=" + data +
-                    ", message='" + message + '\'' +
-                    '}';
-        }
-
-        public boolean isSuccess(){
-            return status == 1;
-        }
-
-    }
 
 
 

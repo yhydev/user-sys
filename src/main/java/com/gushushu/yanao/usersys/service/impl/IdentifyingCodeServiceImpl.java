@@ -33,9 +33,6 @@ public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppCon
 
     public static final int INTERVAL_TIME = 60 * 1000;
 
-    public static final String UNVERIFIED = "Unverified";
-
-    public static final String VERIFIED = "verified";
 
     private boolean isInterval(String phone){
         Date createDate = identifyingCodeRepository.findLastTime(phone);
@@ -53,7 +50,7 @@ public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppCon
 
         logger.info("sendParam = [" + sendParam + "]");
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity response = null;
 
         if(isInterval(sendParam.phone)){
 
@@ -66,35 +63,35 @@ public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppCon
 
             identifyingCodeRepository.save(identifyingCode);
             //TODO 发送验证码接口调用
-            responseEntity = new ResponseEntityBuilder().success(null);
+            response = new ResponseEntityBuilder().success(null);
 
         }else {
-            responseEntity = new ResponseEntityBuilder().failed("一分钟只能发送一条验证码");
+            response = new ResponseEntityBuilder().failed("一分钟只能发送一条验证码");
         }
 
-        logger.info("responseEntity = " + responseEntity);
+        logger.info("response = " + response);
 
-        return responseEntity;
+        return response;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<IdentifyingCode> validate(ValidateParam param) {
+    public ResponseEntity<ResponseBody<IdentifyingCode>> validate(ValidateParam param) {
 
         logger.info("param = [" + param + "]");
-        ResponseEntity entity = null;
+        ResponseEntity response = null;
 
         IdentifyingCode code = identifyingCodeRepository.findCode(param.phone,param.type,UNVERIFIED,param.code);
 
         if(code != null){
             code.setStatus(VERIFIED);
             identifyingCodeRepository.save(code);
-            entity = new ResponseEntityBuilder().success(null);
+            response = new ResponseEntityBuilder().success(null);
         }else{
-            entity = new ResponseEntityBuilder().failed("手机验证码有误");
+            response = new ResponseEntityBuilder().failed("手机验证码有误");
         }
 
-        logger.info("entity = " + entity);
-        return entity;
+        logger.info("response = " + response);
+        return response;
     }
 }

@@ -1,19 +1,24 @@
 package com.gushushu.yanao.usersys.service;
 
+import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.Member;
+import com.gushushu.yanao.usersys.entity.MemberSession;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.http.ResponseEntity;
 
-import com.gushushu.yanao.usersys.model.BankInfo;
-import com.gushushu.yanao.usersys.model.IdInfo;
-
 public interface MemberService {
 
+    //注册验证码类型
+    public final static String VCODE_TYPE_REGISTER = "register";
+
+    //找回密码验证码类型
+    public final static String VCODE_TYPE_VERIFICATION_CODE = "findPassword";
 
 
-    ResponseEntity<Member> register(String account, String phoneCode, String password);
+    ResponseEntity<ResponseBody<MemberSession>> register(RegisterParam registerParam);
 
-//    ResponseEntity<UserToken> login(String account,String password);
+    ResponseEntity<ResponseBody<MemberSession>> login(LoginParam loginParam);
+/*
 
     ResponseEntity<Member> findPassword(String account,String phoneCode,String password);
 
@@ -21,17 +26,37 @@ public interface MemberService {
 
     ResponseEntity<Member> updateEmail(String userId, String password,String email);
 
-    ResponseEntity<Member> update(String userId,BankInfo bankInfo, IdInfo idInfo);
 
     ResponseEntity<Member> updateMoney(String userId,Long money);
 
     ResponseEntity<Member> updateOuterDiscAccount(String userId,String outerDiscAccount);
+*/
 
 
 
-    public static class RegisterParam{
+    public static class RegisterParam extends LoginParam{
+        private Integer phoneCode;
+
+
+        public Integer getPhoneCode() {
+            return phoneCode;
+        }
+
+        public void setPhoneCode(Integer phoneCode) {
+            this.phoneCode = phoneCode;
+        }
+
+        @Override
+        public String toString() {
+            return "RegisterParam{" +
+                    "phoneCode='" + phoneCode + '\'' +
+                    "} " + super.toString();
+        }
+    }
+
+
+    public static class LoginParam{
         private String account;
-        private String phoneCode;
         private String password;
 
         public String getAccount() {
@@ -42,27 +67,18 @@ public interface MemberService {
             this.account = account;
         }
 
-        public String getPhoneCode() {
-            return phoneCode;
-        }
-
-        public void setPhoneCode(String phoneCode) {
-            this.phoneCode = MD5Encoder.encode(phoneCode.getBytes());
-        }
-
         public String getPassword() {
             return password;
         }
 
         public void setPassword(String password) {
-            this.password = password;
+            this.password = MD5Encoder.encode(password.getBytes());
         }
 
         @Override
         public String toString() {
-            return "RegisterParam{" +
+            return "LoginParam{" +
                     "account='" + account + '\'' +
-                    ", phoneCode='" + phoneCode + '\'' +
                     ", password='" + password + '\'' +
                     '}';
         }

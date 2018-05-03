@@ -1,3 +1,4 @@
+/*
 package com.gushushu.yanao.usersys.service;
 
 import com.gushushu.yanao.usersys.entity.Transaction;
@@ -22,3 +23,4 @@ public interface TransactionService {
 
 
 }
+*/

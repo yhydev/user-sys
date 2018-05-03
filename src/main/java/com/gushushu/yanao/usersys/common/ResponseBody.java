@@ -1,47 +1,26 @@
 package com.gushushu.yanao.usersys.common;
 
-public class ResponseBody<T> {
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 
-
-
+public  class ResponseBody<C>{
     private Integer status;
-    private T data;
+    private C data;
     private String message;
-    private Boolean success;
 
-
-    public ResponseBody success(T data){
-        this.data = data;
-        return success();
+    @Override
+    public String toString() {
+        return "ResponseBody{" +
+                "status='" + status + '\'' +
+                ", data=" + data +
+                ", message='" + message + '\'' +
+                '}';
     }
 
-    public ResponseBody error(String message){
-        this.message = message;
-        return error();
+    public boolean isSuccess(){
+        return status == 1;
     }
-
-
-    public ResponseBody success(){
-        this.status = 1;
-        this.success = true;
-        return this;
-    }
-
-    public Boolean getSuccess() {
-        return success;
-    }
-
-    public void setSuccess(Boolean success) {
-        this.success = success;
-    }
-
-    public ResponseBody error(){
-        this.status = 0;
-        this.success = false;
-        return this;
-    }
-
-
 
     public Integer getStatus() {
         return status;
@@ -51,11 +30,11 @@ public class ResponseBody<T> {
         this.status = status;
     }
 
-    public T getData() {
+    public C getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(C data) {
         this.data = data;
     }
 
@@ -67,3 +46,4 @@ public class ResponseBody<T> {
         this.message = message;
     }
 }
+
