@@ -17,13 +17,20 @@ public class Member {
     private Date createDate;// 创建日期
     private String type;//类型
     private String status;//状态 未启动
-    private String identityCard;//身份证
-    private String name;// 姓名
     private Long balance;//余额（分）
     private String email;//邮箱
-    private String bankCardNo;//银行卡
-    private String bankName;//银行卡名称
+
+
+    private String name; //姓名
+    private String idCard; //身份证
+    private String idCardFrontUrl; //身份证正面
+    private String idCardBehindUrl; //身份证反面
+    private String bankCard;//银行卡
+    private String phoneNumber;//银行卡预留手机号
+    private Date realNameTime;//实名时间
+
     private String innerDiscAccount;//内盘账户
+    private Date setInnerDiscTime;
 
 
     public String getMemberId() {
@@ -74,22 +81,6 @@ public class Member {
         this.status = status;
     }
 
-    public String getIdentityCard() {
-        return identityCard;
-    }
-
-    public void setIdentityCard(String identityCard) {
-        this.identityCard = identityCard;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Long getBalance() {
         return balance;
     }
@@ -106,20 +97,60 @@ public class Member {
         this.email = email;
     }
 
-    public String getBankCardNo() {
-        return bankCardNo;
+    public String getName() {
+        return name;
     }
 
-    public void setBankCardNo(String bankCardNo) {
-        this.bankCardNo = bankCardNo;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getBankName() {
-        return bankName;
+    public String getIdCard() {
+        return idCard;
     }
 
-    public void setBankName(String bankName) {
-        this.bankName = bankName;
+    public void setIdCard(String idCard) {
+        this.idCard = idCard;
+    }
+
+    public String getIdCardFrontUrl() {
+        return idCardFrontUrl;
+    }
+
+    public void setIdCardFrontUrl(String idCardFrontUrl) {
+        this.idCardFrontUrl = idCardFrontUrl;
+    }
+
+    public String getIdCardBehindUrl() {
+        return idCardBehindUrl;
+    }
+
+    public void setIdCardBehindUrl(String idCardBehindUrl) {
+        this.idCardBehindUrl = idCardBehindUrl;
+    }
+
+    public String getBankCard() {
+        return bankCard;
+    }
+
+    public void setBankCard(String bankCard) {
+        this.bankCard = bankCard;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Date getRealNameTime() {
+        return realNameTime;
+    }
+
+    public void setRealNameTime(Date realNameTime) {
+        this.realNameTime = realNameTime;
     }
 
     public String getInnerDiscAccount() {
@@ -128,5 +159,36 @@ public class Member {
 
     public void setInnerDiscAccount(String innerDiscAccount) {
         this.innerDiscAccount = innerDiscAccount;
+    }
+
+    public Date getSetInnerDiscTime() {
+        return setInnerDiscTime;
+    }
+
+    public void setSetInnerDiscTime(Date setInnerDiscTime) {
+        this.setInnerDiscTime = setInnerDiscTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "memberId='" + memberId + '\'' +
+                ", account='" + account + '\'' +
+                ", password='" + password + '\'' +
+                ", createDate=" + createDate +
+                ", type='" + type + '\'' +
+                ", status='" + status + '\'' +
+                ", balance=" + balance +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", idCard='" + idCard + '\'' +
+                ", idCardFrontUrl='" + idCardFrontUrl + '\'' +
+                ", idCardBehindUrl='" + idCardBehindUrl + '\'' +
+                ", bankCard='" + bankCard + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", realNameTime=" + realNameTime +
+                ", innerDiscAccount='" + innerDiscAccount + '\'' +
+                ", setInnerDiscTime=" + setInnerDiscTime +
+                '}';
     }
 }

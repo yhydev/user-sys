@@ -1,5 +1,6 @@
 package com.gushushu.yanao.usersys.common;
 
+import org.apache.tomcat.util.buf.HexUtils;
 import sun.misc.BASE64Encoder;
 
 import java.io.UnsupportedEncodingException;
@@ -20,7 +21,7 @@ public class SecretEncode {
 		// 加密后的字符串
 		String newstr = null;
 		try {
-			newstr = base64en.encode(md5.digest(str.getBytes("utf-8")));
+			newstr = HexUtils.toHexString(md5.digest(str.getBytes("utf-8")));
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

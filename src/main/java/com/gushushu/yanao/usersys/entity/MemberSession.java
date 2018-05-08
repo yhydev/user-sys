@@ -56,4 +56,15 @@ public class MemberSession {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+
+    @Override
+    public String toString() {
+        return "MemberSession{" +
+                "sessionId='" + sessionId + '\'' +
+                ", member=" + member +
+                ", token='" + token + '\'' +
+                ", createTime=" + createTime +
+                '}';
+    }
 }

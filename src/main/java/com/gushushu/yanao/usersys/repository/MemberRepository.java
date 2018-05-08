@@ -1,23 +1,39 @@
 package com.gushushu.yanao.usersys.repository;
 
 import com.gushushu.yanao.usersys.entity.Member;
+import com.gushushu.yanao.usersys.model.BackMember;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface MemberRepository extends JpaRepository<Member,String> {
+public interface MemberRepository extends JpaRepository<Member,String> ,JpaSpecificationExecutor<Member> {
 
 
     Long countByAccount(String account);
 
+    Member findByMemberId(String memberId);
 
     Member findByAccount(String account);
 
     @Query("select t.memberId from Member t where t.password = :password and t.account = :account")
     String findId(@Param("account") String account,@Param("password") String password);
 
-/*
+    //@Query("select t from  Member t ")
+    //Page findAll(Specification<Member> specification, Pageable pageable);
+
+    //@Query("select new com.yanyangpapa.livevideo.model.FrontMember(t.memberId,t.nickname,t.role) from  Member t ")
+
+    @Query("select new com.gushushu.yanao.usersys.model.BackMember(t.account, t.name, t.idCard, t.idCardFrontUrl, t.idCardBehindUrl, t.bankCard, t.phoneNumber, t.createDate, t.realNameTime) from Member t")
+    Page findAll(Specification<Member> specification, Pageable pageable);
+
+
+    /*
+
+
     @Modifying
     @Query("update Member set password = :newPassword where memberId = :memberId and password = :password")
     Integer updatePassword(@Param("memberId") String memberId,@Param("password") String password,@Param("newPassword") String newPassword);

@@ -2,24 +2,27 @@ package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
-import com.gushushu.yanao.usersys.common.SecretEncode;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Pattern;
+import java.util.List;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -34,7 +37,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Autowired
-    private MemberRepository MemberRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
     private MemberSessionService memberSessionService;
@@ -42,6 +45,33 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private IdentifyingCodeService identifyingCodeService;
 
+
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseBody<String>> setInnerDiscAccount(SetInnerDiscAccountParam setInnerDiscAccountParam) {
+
+        System.out.println("setInnerDiscAccountParam = [" + setInnerDiscAccountParam + "]");
+
+        ResponseEntity<ResponseBody<String>> response = null;
+
+        Member member = memberRepository.findByMemberId(setInnerDiscAccountParam.getAccountId());
+
+        if(member != null){
+
+            member.setSetInnerDiscTime(new Date());
+            member.setInnerDiscAccount(setInnerDiscAccountParam.getInnerDiscAccount());
+
+            memberRepository.save(member);
+            response = ResponseEntityBuilder.success(null);
+
+        }else{
+            response = ResponseEntityBuilder.failed("unknown member");
+        }
+
+        System.out.println("response = " + response);
+
+        return response;
+    }
 
     @Override
     @Transactional
@@ -62,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
         //验证码是否正确
         if(responseEntity.getBody().isSuccess()){
 
-            Long accountCount = MemberRepository.countByAccount(param.getAccount());
+            Long accountCount = memberRepository.countByAccount(param.getAccount());
 
             if(accountCount != 0){
 
@@ -78,7 +108,7 @@ public class MemberServiceImpl implements MemberService {
                 member.setPassword(param.getPassword());
                 member.setAccount(param.getAccount());
                 member.setBalance(0L);
-                MemberRepository.save(member);
+                memberRepository.save(member);
 
                 memberSessionService.saveSession(member.getMemberId());
 
@@ -93,13 +123,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ResponseBody<MemberSession>> login(LoginParam loginParam) {
 
         logger.info("loginParam = [" + loginParam + "]");
 
         ResponseEntity<ResponseBody<MemberSession>> response = null;
 
-        String memberId = MemberRepository.findId(loginParam.getAccount(),loginParam.getPassword());
+        String memberId = memberRepository.findId(loginParam.getAccount(),loginParam.getPassword());
 
         if(memberId == null){
             response = ResponseEntityBuilder.failed("账号或密码错误.");
@@ -111,7 +142,82 @@ public class MemberServiceImpl implements MemberService {
 
         return response;
     }
-/*
+
+    @Override
+    public ResponseEntity<ResponseBody<Page<BackMember>>> search(final SearchParam param, Pageable pageable) {
+
+        logger.info("param = [" + param + "], pageable = [" + pageable + "]");
+
+        ResponseEntity<ResponseBody<Page<BackMember>>> response;
+
+        Specification<Member> specification = new Specification<Member>() {
+            @Override
+            public Predicate toPredicate(Root<Member> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> list = new ArrayList<Predicate>();
+
+                if(param.getWaitSetInnerDisc() == true){
+                    Expression cName = root.get("idCard").as(String.class);
+                    Predicate predicate = criteriaBuilder.isNotNull(cName);
+                    list.add(predicate);
+
+
+                    Expression cName2 = root.get("innerDiscAccount").as(String.class);
+                    Predicate predicate2 = criteriaBuilder.equal(cName2,null);
+                    list.add(predicate);
+                }
+
+                Predicate[] p = new Predicate[list.size()];
+                return criteriaBuilder.and(list.toArray(p));
+            }
+        };
+
+
+        Page ret = memberRepository.findAll(specification,pageable);
+
+        response = ResponseEntityBuilder.success(ret);
+
+        logger.info("response = " + response);
+
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseBody> realName(RealNameParam param) {
+
+        logger.info("param = [" + param + "]");
+
+        ResponseEntity response = null;
+
+        ResponseEntity<ResponseBody<Member>> rep = memberSessionService.findMember(param.getToken());
+
+        if(rep.getBody().isSuccess()){
+            Member member = rep.getBody().getData();
+            member.setIdCard(param.getIdCard());
+            member.setName(param.getName());
+            member.setBankCard(param.getBankCard());
+            member.setIdCardBehindUrl(param.getIdCardBehindUrl());
+            member.setIdCardFrontUrl(param.getIdCardFrontUrl());
+            member.setPhoneNumber(param.getPhoneNumber());
+            member.setRealNameTime(new Date());
+
+            memberRepository.save(member);
+
+            response = ResponseEntityBuilder.success(null);
+        }else{
+            response = ResponseEntityBuilder.failed(rep.getBody().getMessage());
+        }
+
+        logger.info("response = " + response);
+
+        return response;
+    }
+
+
+
+
+    /*
 
     @Transactional
     public ResponseEntity<Member> findPassword(String account, String phoneCode, String password) {
