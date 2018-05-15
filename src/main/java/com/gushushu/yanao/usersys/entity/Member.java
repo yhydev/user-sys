@@ -35,6 +35,11 @@ public class Member {
     private String innerDiscAccount;//内盘账户
     private Date setInnerDiscTime;
 
+    public Member(String memberId) {
+        this.memberId = memberId;
+    }
+    public Member() {
+    }
 
     public String getMemberId() {
         return memberId;
@@ -181,7 +186,7 @@ public class Member {
     }
 
     public Boolean getOpenAccount() {
-        return openAccount;
+        return openAccount != null && openAccount ;
     }
 
     public void setOpenAccount(Boolean openAccount) {

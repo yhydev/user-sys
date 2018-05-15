@@ -16,12 +16,45 @@ public class Transaction {
     private String type;
     private Date createDate;
     private String status;
+    private String payAccount;//交易账户
+    private String receiveAccount;//接收账户
+
 
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
     private Date updateDate;
-    private String remark;
+
+    public String getPayAccount() {
+        return payAccount;
+    }
+
+    public void setPayAccount(String payAccount) {
+        this.payAccount = payAccount;
+    }
+
+    public String getReceiveAccount() {
+        return receiveAccount;
+    }
+
+    public void setReceiveAccount(String receiveAccount) {
+        this.receiveAccount = receiveAccount;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "transactionId='" + transactionId + '\'' +
+                ", money=" + money +
+                ", type='" + type + '\'' +
+                ", createDate=" + createDate +
+                ", status='" + status + '\'' +
+                ", payAccount='" + payAccount + '\'' +
+                ", receiveAccount='" + receiveAccount + '\'' +
+                ", member=" + member +
+                ", updateDate=" + updateDate +
+                '}';
+    }
 
     public String getTransactionId() {
         return transactionId;
@@ -77,27 +110,5 @@ public class Transaction {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "transactionId='" + transactionId + '\'' +
-                ", money=" + money +
-                ", type='" + type + '\'' +
-                ", createDate=" + createDate +
-                ", status='" + status + '\'' +
-                ", member=" + member +
-                ", updateDate=" + updateDate +
-                ", remark='" + remark + '\'' +
-                '}';
     }
 }
