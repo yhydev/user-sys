@@ -37,7 +37,7 @@ public class IdentifyingCodeServiceImplTest {
     public void validate() {
 
         IdentifyingCodeService.ValidateParam validateParam = new IdentifyingCodeService.ValidateParam();
-        validateParam.code = 522817;
+        validateParam.code = "522817";
         validateParam.phone = "123";
         validateParam.type = "register";
 

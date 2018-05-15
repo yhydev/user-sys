@@ -14,7 +14,7 @@ public class IdentifyingCode {
     @GenericGenerator(name = "uuid",strategy = "uuid")
     @GeneratedValue(generator = "uuid")
     private String identifyingCodeId;//验证码Id
-    private Integer code;//代码(验证码)
+    private String code;//代码(验证码)
     private String type;//
     private String status;//
     private Date createDate;//创建日期
@@ -28,11 +28,11 @@ public class IdentifyingCode {
         this.identifyingCodeId = identifyingCodeId;
     }
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(String code) {
         this.code = code;
     }
 

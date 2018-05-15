@@ -55,7 +55,7 @@ public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppCon
         if(isInterval(sendParam.phone)){
 
             IdentifyingCode identifyingCode = new IdentifyingCode();
-            identifyingCode.setCode(random.nextInt(899999) + 100000);
+            identifyingCode.setCode(String.valueOf(random.nextInt(899999) + 100000));
             identifyingCode.setPhone(sendParam.phone);
             identifyingCode.setType(sendParam.type);
             identifyingCode.setCreateDate(new Date());

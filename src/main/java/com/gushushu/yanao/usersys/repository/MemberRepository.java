@@ -2,6 +2,7 @@ package com.gushushu.yanao.usersys.repository;
 
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.model.BackMember;
+import com.gushushu.yanao.usersys.model.FrontMember;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,12 @@ public interface MemberRepository extends JpaRepository<Member,String> ,JpaSpeci
     Member findByMemberId(String memberId);
 
     Member findByAccount(String account);
+
+    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount) from Member t where t.memberId = :id")
+    FrontMember findFront(@Param("id") String id);
+
+    @Query("select t.account from Member t where  t.memberId = :memberId")
+    String findAccount(@Param("memberId") String memberId);
 
     @Query("select t.memberId from Member t where t.password = :password and t.account = :account")
     String findId(@Param("account") String account,@Param("password") String password);

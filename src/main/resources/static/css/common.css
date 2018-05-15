@@ -1,0 +1,89 @@
+
+.router-view{
+    padding: 16px;
+}
+
+
+
+/*表单输入框样式*/
+.form-input{
+    height: 44px;
+    font-size: 20px;
+    padding: 10px;
+}
+
+
+
+/*表单数据验证*/
+label.error{
+    color: red;
+    display: block;
+}
+
+.form-control,.btn{
+    border-radius: 0px!important;
+}
+
+/*验证码样式*/
+.image-code-box > *{
+    display: inline-block;
+}
+
+.image-code-box .code-ipt ,.image-code-box .code-img{
+    vertical-align: top;
+}
+
+.image-code-box .code-ipt{
+    width: 50%;
+}
+
+.image-code-box .code-img{
+    margin-left: 4%;
+    width: 46%;
+    height: 44px;
+    cursor: pointer;
+}
+
+
+/*手机验证码样式*/
+.phone-code-box > *{
+    display: inline-block;
+}
+
+.phone-code-box .code-ipt ,.image-code-box .code-send-btn{
+    vertical-align: top;
+}
+
+.phone-code-box .code-ipt{
+    width: 50%;
+}
+
+.phone-code-box .code-send-btn{
+    width: 48%;
+    height: 44px;
+}
+
+
+/*upload-template 样式*/
+
+.select-upload-btn,.webuploader-pick{
+    padding: 0px!important;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+}
+
+.select-file{
+    background-color: #00b7ee!important;
+}
+
+
+
+.unselect-file{
+    background-color: #ccc!important;
+}
+
+
+[v-clock]{
+    display: none!important;
+}

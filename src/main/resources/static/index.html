@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>首页</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/css/common.css" rel="stylesheet">
+    <link href="/plugins/webuploader-0.1.5/webuploader.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid" id="app">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="#">点对点交易系统</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <!--<li class="active">
+                            <router-link v-clock to="/openAccount">内盘期货开户</router-link>
+                        </li>-->
+                        <!-- <li>
+                             <a href="#">Link</a>
+                         </li>
+                         <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown<strong class="caret"></strong></a>
+                             <ul class="dropdown-menu">
+                                 <li>
+                                     <a href="#">Action</a>
+                                 </li>
+                                 <li>
+                                     <a href="#">Another action</a>
+                                 </li>
+                                 <li>
+                                     <a href="#">Something else here</a>
+                                 </li>
+                                 <li class="divider">
+                                 </li>
+                                 <li>
+                                     <a href="#">Separated link</a>
+                                 </li>
+                                 <li class="divider">
+                                 </li>
+                                 <li>
+                                     <a href="#">One more separated link</a>
+                                 </li>
+                             </ul>
+                         </li>
+-->                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <router-link v-clock to="/openAccount">内盘期货开户</router-link>
+                        </li>
+                        <li class="dropdown">
+                            <a href="javascript:void()" class="dropdown-toggle"  data-toggle="dropdown">
+                                <strong v-clock>{{profile.account}}</strong>
+                                <strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+
+                                <li>
+                                    <router-link v-clock to="/deposit">内盘期货入金</router-link>
+                                </li>
+                                <li>
+                                    <router-link v-clock to="/deposit">内盘期货出金</router-link>
+                                </li>
+
+                               
+                                <li class="divider">
+                                </li>
+                                <li>
+                                    <a href="#">退出</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
+
+        </div>
+    </div>
+
+
+    <!--Router start-->
+    <div class="row clearfix">
+        <div class="router-view">
+            <div class="col-md-12 column">
+                <router-view></router-view>
+            </div>
+        </div>
+    </div>
+    <!--Router end-->
+</div>
+
+
+    <script type="text/x-template" id="router-template">
+        <div v-clock  class="col-md-8 col-md-offset-2 column">
+
+            <div class="row">
+                <slot name="title"></slot>
+            </div>
+            <hr>
+            <div class="row">
+                <slot name="content"></slot>
+            </div>
+            <hr>
+            <div class="row">
+                <slot name="foot">
+                </slot>
+            </div>
+        </div>
+    </script>
+
+
+
+
+<!--no-open-account-template-->
+<script type="text/x-template" id="no-open-account-template">
+    <p style="margin: 100px;text-align: center;padding:50px">您还没有期货交易账户，暂不能入金，如需开户点击
+        <router-link v-clock to="/openAccount">内盘期货开户</router-link>
+    </p>
+</script>
+<!--no-open-account-template  end-->
+
+<!--deposit-template-->
+<script type="text/x-template" id="deposit-template">
+
+    <router-template>
+        <h2 slot="title">内盘入金</h2>
+
+            <div slot="content">
+
+                <div v-if="member.openAccount == false"  >
+                    <no-open-account-template></no-open-account-template>
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <p slot="foot">温馨提示：如果您在操作过程中遇到问题，请致电客户服务电话：03718237421</p>
+
+    </router-template>
+</script>
+<!--deposit-template end-->
+
+
+    <script type="text/x-template" id="open-account-router">
+
+
+            <router-template>
+                <h2 slot="title">外盘入金</h2>
+                <div slot="content">
+
+
+                    <div v-if="member.applyForOpenAccount == true" style="margin: 100px">
+                        <div v-if="member.openAccount == true" style="text-align: center;padding:50px" >
+                            <p>您已开户成功！期货账号为：{{member.innerDiscAccount}}</p>
+                        </div>
+
+                        <div v-if="member.openAccount == false" style="text-align: center;padding:50px" >
+                            <p>您的申请已提交，我们会在1-2 个工作日为您开户，请注意您的手机电话，短信通知。</p>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-4 col-md-offset-4">
+                        <form  v-if="member.applyForOpenAccount == false"  role="form" action="/member/openAccount" id="openAccount-form">
+
+                            <div class="form-group">
+                                <label >姓名</label><input type="text" name="name" class="form-control" />
+                                <input type="hidden" v-model="memberSession.token" name="token"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label >身份证</label><input type="text" name="idCard" class="form-control"  />
+                            </div>
+                            <div class="form-group">
+                                <label >银行卡号</label><input type="text" name="bankCard" class="form-control"  />
+                            </div>
+                            <div class="form-group">
+                                <label >银行卡预留手机号</label><input name="phoneNumber" type="text" class="form-control"  />
+                            </div>
+                            <div class="form-group">
+                                <label >身份证正面照</label>
+                                <upload-component input-name="idCardBehindUrl"></upload-component>
+                            </div>
+                            <div class="form-group">
+                                <label >身份证背面照</label>
+                                <upload-component input-name="idCardFrontUrl"></upload-component>
+                            </div>
+
+
+                            <br>
+                            <button class="btn btn-default">提交</button>
+                        </form>
+
+                    </div>
+
+
+                </div>
+                <p slot="foot">温馨提示：如果您在操作过程中遇到问题，请致电客户服务电话：03718237421</p>
+            </router-template>
+
+
+
+    </script>
+
+
+
+    <script src="/js/require.config.js"></script>
+    <script  src="https://cdn.bootcss.com/require.js/2.3.5/require.min.js" data-main="/js/index.js"></script>
+
+</body>
+</html>

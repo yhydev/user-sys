@@ -18,6 +18,6 @@ public interface IdentifyingCodeRepository extends JpaRepository<IdentifyingCode
 
 
     @Query("select t from IdentifyingCode t where t.phone = :phone and t.type = :type and t.status = :status and t.code = :code")
-    IdentifyingCode findCode(@Param("phone") String phone, @Param("type") String type, @Param("status") String status,@Param("code") Integer code);
+    IdentifyingCode findCode(@Param("phone") String phone, @Param("type") String type, @Param("status") String status,@Param("code") String code);
 
 }

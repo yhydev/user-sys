@@ -1,68 +1,73 @@
 package com.gushushu.yanao.usersys;
 
+import com.google.code.kaptcha.impl.DefaultKaptcha;
+import com.google.code.kaptcha.util.Config;
+import com.gushushu.yanao.usersys.filter.ImageCodeAuthFilter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.server.ErrorPageRegistrarBeanPostProcessor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.StringUtils;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Properties;
 
 
 @SpringBootApplication
 public class Application {
 
-    Logger logger = Logger.getLogger(Application.class);
+    static Logger logger = Logger.getLogger(Application.class);
+
+
+    @Autowired
+
 
     public static void main(String arg[]){
-        SpringApplication.run(Application.class,arg);
+        ApplicationContext applicationContext = SpringApplication.run(Application.class,arg);
+        logger.info(Arrays.toString(applicationContext.getBeanDefinitionNames()));
+
+
+
+
+
+
     }
 
-  /*  @Bean
-    public FilterRegistrationBean tokenFilterBean(@Autowired TokenFilter tokenFilter){
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(tokenFilter);
-        filterRegistrationBean.addUrlPatterns("/*");
 
+    /**
+     * 图片验证码参数
+     * @return
+     */
+    @Bean
+    public FilterRegistrationBean imageCodeAuth(){
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setFilter(new ImageCodeAuthFilter());
+        filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
 
 
+
     @Bean
-    public JedisPool jedisPool(@Autowired RedisConfig redisConfig){
+    public DefaultKaptcha defaultKaptcha() throws IOException {
 
-        logger.info("------initialize redisPoll Bean------");
-
-        logger.info("param redisConfig:\t"+redisConfig);
-
-        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxIdle(redisConfig.getMaxIdle());
-        jedisPoolConfig.setMinIdle(redisConfig.getMinIdle());
-        jedisPoolConfig.setMaxTotal(redisConfig.getMaxActive());
-
-        JedisPool jedisPool = null;
-
-        if(StringUtils.isEmpty(redisConfig.getPassword())){
-            jedisPool = new JedisPool(jedisPoolConfig,redisConfig.getAddress(),
-                    redisConfig.getPort());
-        }else{
-            jedisPool = new JedisPool(jedisPoolConfig,redisConfig.getAddress(),redisConfig.getPort(),
-                    redisConfig.getTimeout(),redisConfig.getPassword());
-        }
-
-
-        Jedis jedis = jedisPool.getResource();
-        jedis.ping();
-        jedis.close();
-
-        return jedisPool;
+        DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
+        InputStream inputStream = Application.class.getResourceAsStream("/kaptcha.properties");
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        Config config = new Config(properties);
+        defaultKaptcha.setConfig(config);
+        inputStream.close();
+        return defaultKaptcha;
 
     }
 
 
-*/
 
 
 }

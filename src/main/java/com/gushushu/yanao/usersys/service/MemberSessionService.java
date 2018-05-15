@@ -5,6 +5,7 @@ import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import org.springframework.http.ResponseEntity;
 
 public interface MemberSessionService {
@@ -24,12 +25,15 @@ public interface MemberSessionService {
     ResponseEntity<ResponseBody<String>> findMemberId(String token);
 
 
+    ResponseEntity<ResponseBody<FrontMemberSession>> findSession(String token);
+
+
     /**
      * 保存会话
      * @param member
      * @return
      */
-    ResponseEntity<ResponseBody<MemberSession>> saveSession(String member);
+    ResponseEntity<ResponseBody<FrontMemberSession>> saveSession(String member);
 
 
 }

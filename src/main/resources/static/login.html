@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登陆</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/login.css" rel="stylesheet">
+</head>
+<body>
+    <div class="main-box">
+        <div class="container">
+            <div class="row main-box">
+
+                <div class="col-md-2 column">
+                </div>
+
+                <div class="col-md-4 column" >
+                    <h3>
+                        账户登陆
+                    </h3>
+                    <p>如果需要帮助，请拨打客服电话：037901978234</p>
+                </div>
+
+                <div class="col-md-4 column" >
+                    <form role="form" id="login-box" action="/member/login">
+                        <div class="form-group">
+                            <label>手机号</label><input type="text" class="form-control form-input" name="account" />
+                        </div>
+                        <div class="form-group">
+                            <label>密码</label><input type="password" class="form-control form-input" name="password" />
+                        </div>
+                        <button type="submit" class="btn btn-default">登陆</button>
+                        <hr>
+                        <div>
+                            <p>没有账户？<a class="" href="register.html">立即注册</a></p>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-2 column">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="/js/require.config.js"></script>
+    <script src="https://cdn.bootcss.com/require.js/2.3.5/require.min.js" data-main="/js/login.js"></script>
+
+</body>
+</html>

@@ -1,8 +1,10 @@
 package com.gushushu.yanao.usersys.service.impl;
 
+import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.repository.MemberSessionRepository;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
@@ -25,6 +27,9 @@ public class MemberSessionServiceImpl implements MemberSessionService {
     @Autowired
     private MemberSessionRepository memberSessionRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Override
     public ResponseEntity findMemberId(String token){
 
@@ -43,6 +48,29 @@ public class MemberSessionServiceImpl implements MemberSessionService {
         logger.info("responseEntity = " + responseEntity);
 
         return responseEntity;
+    }
+
+    @Override
+    public ResponseEntity<ResponseBody<FrontMemberSession>> findSession(String token) {
+
+        logger.info("token = [" + token + "]");
+
+        ResponseEntity response = null;
+
+        FrontMemberSession frontMemberSession = memberSessionRepository.findSession(token);
+
+        if (frontMemberSession == null){
+            response = ResponseEntityBuilder.failed("会话超时");
+        }else{
+            response = ResponseEntityBuilder.<FrontMemberSession>success(frontMemberSession);
+        }
+
+
+
+
+        logger.info("response = " + response);
+
+        return response;
     }
 
     @Override
@@ -65,6 +93,8 @@ public class MemberSessionServiceImpl implements MemberSessionService {
         return responseEntity;
     }
 
+
+
     @Override
     @Transactional
     public ResponseEntity saveSession(String memberId) {
@@ -81,6 +111,12 @@ public class MemberSessionServiceImpl implements MemberSessionService {
 
         memberSessionRepository.save(memberSession);
 
-        return ResponseEntityBuilder.success(memberSession);
+        String account = memberRepository.findAccount(memberId);
+
+
+
+        FrontMemberSession frontMemberSession = new FrontMemberSession(memberId,token,account);
+
+        return ResponseEntityBuilder.success(frontMemberSession);
     }
 }

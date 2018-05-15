@@ -4,9 +4,15 @@ import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.SecretEncode;
 import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.model.BackMember;
+import com.gushushu.yanao.usersys.model.FrontMember;
+import com.gushushu.yanao.usersys.model.FrontMemberSession;
+import org.hibernate.validator.constraints.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+
+import javax.persistence.Entity;
+import javax.validation.constraints.Size;
 
 public interface MemberService {
 
@@ -16,16 +22,18 @@ public interface MemberService {
     //找回密码验证码类型
     public final static String VCODE_TYPE_VERIFICATION_CODE = "findPassword";
 
+    ResponseEntity<ResponseBody<FrontMember>> getFrontMember(String token);
 
     ResponseEntity<ResponseBody<String>> setInnerDiscAccount(SetInnerDiscAccountParam setInnerDiscAccountParam);
 
-    ResponseEntity<ResponseBody<MemberSession>> register(RegisterParam registerParam);
+    ResponseEntity<ResponseBody<FrontMemberSession>> register(RegisterParam registerParam);
 
-    ResponseEntity<ResponseBody<MemberSession>> login(LoginParam loginParam);
+    ResponseEntity<ResponseBody<FrontMemberSession>> login(LoginParam loginParam);
 
     ResponseEntity<ResponseBody<Page<BackMember>>> search(SearchParam param, Pageable pageable);
 
     ResponseEntity<ResponseBody> realName(RealNameParam param);
+
 
 
     /*
@@ -73,12 +81,31 @@ public interface MemberService {
     }
 
     public static class RealNameParam{
+        @NotEmpty(message = "token 不能为空")
+        @Length(message = "token 有误")
         private String token;
+
+        @NotEmpty(message = "姓名不能为空")
         private String name; //姓名
+
+        @Length(min = 15,max = 18)
+        @NotEmpty(message = "身份证不能为空")
         private String idCard; //身份证
+
+        @URL(message = "身份证正面有误")
+        @NotEmpty(message = "身份证正面不能为空")
         private String idCardFrontUrl; //身份证正面
+
+        @URL(message = "身份证反面有误")
+        @NotEmpty(message = "身份证反面不能为空")
         private String idCardBehindUrl; //身份证反面
+
+        @Length(min = 16,max = 19,message = "银行卡有误")
+        @NotEmpty(message = "银行卡不能为空")
         private String bankCard;//银行卡
+
+        @Length(min = 11,max = 11,message = "银行卡预留号码有误")
+        @NotEmpty(message = "银行卡预留号码不能为空")
         private String phoneNumber;//银行卡预留手机号
 
         public String getToken() {
@@ -171,14 +198,15 @@ public interface MemberService {
     }
 
     public static class RegisterParam extends LoginParam{
-        private Integer phoneCode;
 
+        @NotBlank(message = "验证码不能为空")
+        private String phoneCode;
 
-        public Integer getPhoneCode() {
+        public String getPhoneCode() {
             return phoneCode;
         }
 
-        public void setPhoneCode(Integer phoneCode) {
+        public void setPhoneCode(String phoneCode) {
             this.phoneCode = phoneCode;
         }
 
@@ -192,7 +220,13 @@ public interface MemberService {
 
 
     public static class LoginParam{
+
+        @NotEmpty(message = "手机号不能为空")
+        @Length(min = 11,max = 11,message = "手机号格式不正确")
         private String account;
+
+        @NotEmpty(message = "密码不能为空")
+        @Length(min = 5,max = 18,message = "密码格式为 6-18 个字符")
         private String password;
 
         public String getAccount() {
@@ -204,11 +238,11 @@ public interface MemberService {
         }
 
         public String getPassword() {
-            return password;
+            return SecretEncode.md5(password);
         }
 
         public void setPassword(String password) {
-            this.password = SecretEncode.md5(password);
+            this.password = password;
         }
 
         @Override

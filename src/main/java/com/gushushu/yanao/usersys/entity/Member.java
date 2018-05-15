@@ -21,6 +21,9 @@ public class Member {
     private String email;//邮箱
 
 
+    private Boolean applyForOpenAccount;//是否申请开户
+    private Boolean openAccount;//是否已经开户
+
     private String name; //姓名
     private String idCard; //身份证
     private String idCardFrontUrl; //身份证正面
@@ -169,6 +172,22 @@ public class Member {
         this.setInnerDiscTime = setInnerDiscTime;
     }
 
+    public Boolean getApplyForOpenAccount() {
+        return applyForOpenAccount;
+    }
+
+    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
+        this.applyForOpenAccount = applyForOpenAccount;
+    }
+
+    public Boolean getOpenAccount() {
+        return openAccount;
+    }
+
+    public void setOpenAccount(Boolean openAccount) {
+        this.openAccount = openAccount;
+    }
+
     @Override
     public String toString() {
         return "Member{" +
@@ -180,6 +199,8 @@ public class Member {
                 ", status='" + status + '\'' +
                 ", balance=" + balance +
                 ", email='" + email + '\'' +
+                ", applyForOpenAccount=" + applyForOpenAccount +
+                ", openAccount=" + openAccount +
                 ", name='" + name + '\'' +
                 ", idCard='" + idCard + '\'' +
                 ", idCardFrontUrl='" + idCardFrontUrl + '\'' +

@@ -4,6 +4,7 @@ import com.gushushu.yanao.usersys.Application;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import com.gushushu.yanao.usersys.repository.IdentifyingCodeRepository;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
@@ -43,10 +44,10 @@ public class MemberServiceImplTest {
     private IdentifyingCodeService identifyingCodeService;
 
 
-    String account = "123";
-    String password = "123456";
+    String account = "13000000002";
+    String password = "888888";
     String accountId = null;
-
+    String token = null;
 
     @Before
     public void initialize(){
@@ -56,15 +57,24 @@ public class MemberServiceImplTest {
         loginParam.setAccount(account);
         loginParam.setPassword(password);
 
-        ResponseEntity<ResponseBody<MemberSession>> memberSessionResponse = memberService.login(loginParam);
+        ResponseEntity<ResponseBody<FrontMemberSession>> memberSessionResponse = memberService.login(loginParam);
 
         assert  memberSessionResponse.getBody().isSuccess();
 
-        accountId = memberSessionResponse.getBody().getData().getMember().getMemberId();
+        accountId = memberSessionResponse.getBody().getData().getAccount();
+        token = memberSessionResponse.getBody().getData().getToken();
 
     }
 
 
+
+
+    @Test
+    public void frontMember(){
+
+        memberService.getFrontMember(token);
+
+    }
 
 
     @Test
@@ -77,7 +87,7 @@ public class MemberServiceImplTest {
         //错误验证码注册
         registerParam.setAccount(account);
         registerParam.setPassword(password);
-        registerParam.setPhoneCode(416645);
+        registerParam.setPhoneCode("416645");
         memberService.register(registerParam);
 
         System.out.println("**********\tregister(have phone code)\t**********");
@@ -145,7 +155,7 @@ public class MemberServiceImplTest {
         MemberService.LoginParam loginParam = new MemberService.LoginParam();
         loginParam.setPassword(password);
         loginParam.setAccount(account);
-        ResponseEntity<ResponseBody<MemberSession>> rb = memberService.login(loginParam);
+        ResponseEntity<ResponseBody<FrontMemberSession>> rb = memberService.login(loginParam);
 
         if(rb.getBody().isSuccess()){
             realNameParam.setToken(rb.getBody().getData().getToken());
