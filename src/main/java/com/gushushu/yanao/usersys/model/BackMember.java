@@ -4,30 +4,28 @@ import java.util.Date;
 
 public class BackMember {
 
-    private String account;
-
-
+    private String memberId;
+    private String account;//账户 (手机号)
+    private Date createDate;// 创建日期
+    private Boolean applyForOpenAccount;//是否申请开户
+    private Boolean openAccount;//是否已经开户
     private String name; //姓名
     private String idCard; //身份证
     private String idCardFrontUrl; //身份证正面
     private String idCardBehindUrl; //身份证反面
     private String bankCard;//银行卡
     private String phoneNumber;//银行卡预留手机号
-    private Date createDate;//注册时间
-    private Date realNameTime;//实名认证时间
+    private Date openAccountDate;//实名时间
+    private String innerDiscAccount;//内盘账户
+    private Date setInnerDiscDate;//设置内盘账户日期
 
-    public BackMember(){}
 
-    public BackMember(String account, String name, String idCard, String idCardFrontUrl, String idCardBehindUrl, String bankCard, String phoneNumber, Date createDate, Date realNameTime) {
-        this.account = account;
-        this.name = name;
-        this.idCard = idCard;
-        this.idCardFrontUrl = idCardFrontUrl;
-        this.idCardBehindUrl = idCardBehindUrl;
-        this.bankCard = bankCard;
-        this.phoneNumber = phoneNumber;
-        this.createDate = createDate;
-        this.realNameTime = realNameTime;
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
     }
 
     public String getAccount() {
@@ -36,6 +34,30 @@ public class BackMember {
 
     public void setAccount(String account) {
         this.account = account;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Boolean getApplyForOpenAccount() {
+        return applyForOpenAccount;
+    }
+
+    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
+        this.applyForOpenAccount = applyForOpenAccount;
+    }
+
+    public Boolean getOpenAccount() {
+        return openAccount;
+    }
+
+    public void setOpenAccount(Boolean openAccount) {
+        this.openAccount = openAccount;
     }
 
     public String getName() {
@@ -86,34 +108,27 @@ public class BackMember {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getOpenAccountDate() {
+        return openAccountDate;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setOpenAccountDate(Date openAccountDate) {
+        this.openAccountDate = openAccountDate;
     }
 
-    public Date getRealNameTime() {
-        return realNameTime;
+    public String getInnerDiscAccount() {
+        return innerDiscAccount;
     }
 
-    public void setRealNameTime(Date realNameTime) {
-        this.realNameTime = realNameTime;
+    public void setInnerDiscAccount(String innerDiscAccount) {
+        this.innerDiscAccount = innerDiscAccount;
     }
 
-    @Override
-    public String toString() {
-        return "BackMember{" +
-                "account='" + account + '\'' +
-                ", name='" + name + '\'' +
-                ", idCard='" + idCard + '\'' +
-                ", idCardFrontUrl='" + idCardFrontUrl + '\'' +
-                ", idCardBehindUrl='" + idCardBehindUrl + '\'' +
-                ", bankCard='" + bankCard + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", createDate=" + createDate +
-                ", realNameTime=" + realNameTime +
-                '}';
+    public Date getSetInnerDiscDate() {
+        return setInnerDiscDate;
+    }
+
+    public void setSetInnerDiscDate(Date setInnerDiscDate) {
+        this.setInnerDiscDate = setInnerDiscDate;
     }
 }

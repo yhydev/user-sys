@@ -14,32 +14,15 @@ public class Transaction {
     private String transactionId;
     private Long money;
     private String type;
+    private String title;
     private Date createDate;
     private String status;
-    private String payAccount;//交易账户
-    private String receiveAccount;//接收账户
-
-
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
     private Date updateDate;
-
-    public String getPayAccount() {
-        return payAccount;
-    }
-
-    public void setPayAccount(String payAccount) {
-        this.payAccount = payAccount;
-    }
-
-    public String getReceiveAccount() {
-        return receiveAccount;
-    }
-
-    public void setReceiveAccount(String receiveAccount) {
-        this.receiveAccount = receiveAccount;
-    }
+    private String detailId;//交易详情Id
+    private String answer;//交易回答
 
     @Override
     public String toString() {
@@ -47,13 +30,38 @@ public class Transaction {
                 "transactionId='" + transactionId + '\'' +
                 ", money=" + money +
                 ", type='" + type + '\'' +
+                ", title='" + title + '\'' +
                 ", createDate=" + createDate +
                 ", status='" + status + '\'' +
-                ", payAccount='" + payAccount + '\'' +
-                ", receiveAccount='" + receiveAccount + '\'' +
                 ", member=" + member +
                 ", updateDate=" + updateDate +
+                ", detailId='" + detailId + '\'' +
+                ", answer='" + answer + '\'' +
                 '}';
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public String getDetailId() {
+        return detailId;
+    }
+
+    public void setDetailId(String detailId) {
+        this.detailId = detailId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getTransactionId() {

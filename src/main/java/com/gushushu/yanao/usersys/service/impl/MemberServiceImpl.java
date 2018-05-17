@@ -12,6 +12,12 @@ import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.support.QueryBase;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,13 +31,24 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import static com.gushushu.yanao.usersys.entity.QMember.member;
 @Service
 public class MemberServiceImpl implements MemberService {
 
     final static Logger logger = Logger.getLogger(MemberServiceImpl.class);
 
-
+    public static QBean<BackMember> backMemberQBean = Projections.bean(
+            BackMember.class,
+            member.account,
+            member.name, //姓名
+            member.idCard, //身份证
+            member.idCardFrontUrl, //身份证正面
+            member.idCardBehindUrl, //身份证反面
+            member.bankCard,//银行卡
+            member.phoneNumber,//银行卡预留手机号
+            member.createDate,//注册时间
+            member.realNameTime //实名认证时间)
+    );
 
 
     //用户token 超时时间(单位秒)
@@ -47,6 +64,8 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private IdentifyingCodeService identifyingCodeService;
 
+    @Autowired
+    private JPAQueryFactory jpaQueryFactory;
 
     @Override
     public ResponseEntity<ResponseBody<FrontMember>> getFrontMember(String token) {
@@ -56,14 +75,15 @@ public class MemberServiceImpl implements MemberService {
         ResponseEntity<ResponseBody<FrontMember>> response = null;
 
         ResponseEntity<ResponseBody<String>> findMemberIdResponse = memberSessionService.findMemberId(token);
-
+/*
         if(findMemberIdResponse.getBody().isSuccess()){
             FrontMember frontMember = memberRepository.findFront(findMemberIdResponse.getBody().getData());
             response = ResponseEntityBuilder.success(frontMember);
         }else{
             response = ResponseEntityBuilder.failed(findMemberIdResponse.getBody().getMessage());
-        }
+        }*/
 
+//TODO 待删除
         logger.info("response = " + response);
 
         return response;
@@ -146,6 +166,8 @@ public class MemberServiceImpl implements MemberService {
         return response;
     }
 
+
+
     @Override
     @Transactional
     public ResponseEntity<ResponseBody<FrontMemberSession>> login(LoginParam loginParam) {
@@ -167,39 +189,44 @@ public class MemberServiceImpl implements MemberService {
         return response;
     }
 
+    private List<Predicate> generatePredicate(SearchParam searchParam){
+
+        List<Predicate> predicates  = new ArrayList<>();
+
+        if(searchParam.getApplyForOpenAccount() != null){
+            Predicate predicate = member.applyForOpenAccount.eq(searchParam.getApplyForOpenAccount());
+            predicates.add(predicate);
+        }
+
+        if(searchParam.getOpenAccount() != null){
+            Predicate predicate = member.openAccount.eq(searchParam.getOpenAccount());
+            predicates.add(predicate);
+        }
+
+
+        return predicates;
+    }
+
     @Override
-    public ResponseEntity<ResponseBody<Page<BackMember>>> search(final SearchParam param, Pageable pageable) {
+    public <T> ResponseEntity<ResponseBody<QueryResults<T>>> search(SearchParam<T> searchParam) {
 
-        logger.info("param = [" + param + "], pageable = [" + pageable + "]");
+        System.out.println("searchParam = " + searchParam);
 
-        ResponseEntity<ResponseBody<Page<BackMember>>> response;
+        ResponseEntity<ResponseBody<QueryResults<T>>> response;
 
-        Specification<Member> specification = new Specification<Member>() {
-            @Override
-            public Predicate toPredicate(Root<Member> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+        List<Predicate> predicates = generatePredicate(searchParam);
+        Predicate[] predicateArray = new Predicate[predicates.size()];
+        predicates.toArray(predicateArray);
 
-                List<Predicate> list = new ArrayList<Predicate>();
+        QueryResults<T> queryResults = jpaQueryFactory.select(searchParam.getResultBean())
+                .from(member)
+                .where(predicateArray)
+                .offset(searchParam.getPage())
+                .limit(searchParam.getSize())
+                .orderBy(member.memberId.asc())
+                .fetchResults();
 
-                if(param.getWaitSetInnerDisc() == true){
-                    Expression cName = root.get("idCard").as(String.class);
-                    Predicate predicate = criteriaBuilder.isNotNull(cName);
-                    list.add(predicate);
-
-
-                    Expression cName2 = root.get("innerDiscAccount").as(String.class);
-                    Predicate predicate2 = criteriaBuilder.equal(cName2,null);
-                    list.add(predicate);
-                }
-
-                Predicate[] p = new Predicate[list.size()];
-                return criteriaBuilder.and(list.toArray(p));
-            }
-        };
-
-
-        Page ret = memberRepository.findAll(specification,pageable);
-
-        response = ResponseEntityBuilder.success(ret);
+        response = ResponseEntityBuilder.<QueryResults<T>>success(queryResults);
 
         logger.info("response = " + response);
 

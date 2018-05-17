@@ -9,6 +9,7 @@ import com.gushushu.yanao.usersys.repository.IdentifyingCodeRepository;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberService;
+import com.gushushu.yanao.usersys.service.MemberSessionService;
 import org.apache.catalina.User;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -49,7 +50,7 @@ public class MemberServiceImplTest {
     String accountId = null;
     String token = null;
 
-    @Before
+//    @Before
     public void initialize(){
 
         MemberService.LoginParam loginParam = new MemberService.LoginParam();
@@ -120,12 +121,11 @@ public class MemberServiceImplTest {
     @Test
     public void find(){
 
-        register();
+//        register();
 
         MemberService.SearchParam searchParam = new MemberService.SearchParam();
-        Pageable pageable = new PageRequest(0,10);
-        searchParam.setWaitSetInnerDisc(false);
-        memberService.search(searchParam,pageable);
+        searchParam.setResultBean(MemberServiceImpl.backMemberQBean);
+        memberService.search(searchParam);
 
     }
 

@@ -1,38 +1,67 @@
 package com.gushushu.yanao.usersys.service.impl;
 
+import com.gushushu.yanao.usersys.common.JpaQueryUtils;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.Member;
-import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.entity.OfflinePay;
 import com.gushushu.yanao.usersys.entity.Transaction;
+import com.gushushu.yanao.usersys.model.FrontTransaction;
+import com.gushushu.yanao.usersys.repository.OfflinePayRepository;
 import com.gushushu.yanao.usersys.repository.TransactionRepository;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.TransactionService;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.List;
 import javax.transaction.Transactional;
-
 import com.gushushu.yanao.usersys.service.ValidateService;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.QBean;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-
-
+import org.springframework.util.StringUtils;
+import static com.gushushu.yanao.usersys.entity.QTransaction.transaction;
 
 @Service
 public class TransactionServiceImpl implements TransactionService,AppConstant {
 
+
+
 	final static Logger logger = Logger.getLogger(TransactionServiceImpl.class);
-	
+
+    /**
+     * 查找的列，及查询出的对象
+     */
+	public static final QBean<FrontTransaction> frontTransactionQBean = Projections.bean(
+	        FrontTransaction.class,
+            transaction.status,
+            transaction.type,
+            transaction.money,
+            transaction.createDate,
+            transaction.updateDate,
+            transaction.answer,
+            transaction.detailId
+            );
+
+
+	@Autowired
+	private OfflinePayRepository offlinePayRepository;
+
 	@Autowired
 	private TransactionRepository transactionRepository;
 
@@ -42,40 +71,70 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
 	@Autowired
 	private ValidateService validateService;
 
-    @Override
-    public ResponseEntity<ResponseBody<String>> underLinePay(UnderLinePayParam underLinePayParam) {
+	@Autowired
+	private JPAQueryFactory jpaQueryFactory;
 
-        logger.info("underLinePayParam = [" + underLinePayParam + "]");
+    private Transaction generate(String memberId,String type,Long money){
+        return generate(memberId,type,money,null);
+    }
+
+    private Transaction generate(String memberId,String type,Long money,String detailId){
+
+        Transaction transaction = new Transaction();
+
+        transaction.setStatus(WAIT_CHECK_STATUS);
+        transaction.setMoney(money);
+        transaction.setType(type);
+        transaction.setCreateDate(new Date());
+        transaction.setMember(new Member(memberId));
+        transaction.setCreateDate(new Date());
+        if(detailId != null){
+            transaction.setDetailId(detailId);
+        }
+
+        return transaction;
+    }
+
+
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseBody<String>> offlinePay(OfflinePayParam offlinePayParam) {
+
+        logger.info("offlinePayParam = [" + offlinePayParam + "]");
         ResponseEntity response = null;
         String errmsg = null;
         //支付账户和收款账户是否相同
-        if(!underLinePayParam.getPayAccount().equals(underLinePayParam.getReceiveAccount())){
+        if(!offlinePayParam.getPayAccount().equals(offlinePayParam.getReceiveAccount())){
 
-            ResponseEntity<ResponseBody<String>> bankCardResponse = validateService.bankCard(underLinePayParam.getPayAccount());
+            ResponseEntity<ResponseBody<String>> bankCardResponse = validateService.bankCard(offlinePayParam.getPayAccount());
 
             //支付银行卡是否有效
             if(bankCardResponse.getBody().isSuccess()){
-                ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(underLinePayParam.getToken());
+                ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlinePayParam.getToken());
 
                 //用户是否存在
                 if(findMemberResponse.getBody().isSuccess()){
 
-                    //用户是否开户
-                    if(findMemberResponse.getBody().getData().getOpenAccount()){
+                    Member member = findMemberResponse.getBody().getData();
 
-                        Transaction transaction = new Transaction();
-                        transaction.setType(WAIT_CHECK_STATUS);
-                        transaction.setStatus(UNDER_LINE_PAY_TYPE);
-                        transaction.setCreateDate(new Date());
-                        transaction.setPayAccount(underLinePayParam.getPayAccount());
-                        transaction.setReceiveAccount(underLinePayParam.getReceiveAccount());
-                        transaction.setMember(new Member(findMemberResponse.getBody().getData().getMemberId()));
-                        transaction.setStatus(WAIT_CHECK_STATUS);
+                    //用户是否开户
+                    if(member.getOpenAccount()){
+
+                        //保存交易详情
+                        OfflinePay offlinePay = new OfflinePay();
+                        offlinePay.setPayAccount(offlinePayParam.getPayAccount());
+                        offlinePay.setReceiveAccount(offlinePayParam.getReceiveAccount());
+                        offlinePayRepository.save(offlinePay);
+
+                        String memberId = member.getMemberId();
+
+                        Transaction transaction = generate(memberId,OFFLINE_PAY_TYPE,offlinePayParam.getMoney(),offlinePay.getOffLineId());
 
                         transactionRepository.save(transaction);
+                        response = ResponseEntityBuilder.success(transaction.getTransactionId());
 
                     }else{
-                        errmsg = "您还未开通交易账户，暂不能充值";
+                        errmsg = "您还未开通交易账户，暂不能交易";
                     }
 
                 }else{
@@ -97,123 +156,135 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
         return response;
     }
 
-    @Override
-    public ResponseEntity<Transaction> update(String transactionId, String status, String remark) {
-        return null;
-    }
 
     @Override
-    public ResponseEntity<Page<Transaction>> findByUserId(String userId, int page, int size) {
-        return null;
+    @Transactional
+    public ResponseEntity<ResponseBody<String>> offlineWithdraw(OfflineWithdrawParam offlineWithdrawParam) {
+
+        logger.info("offlineWithdrawParam = [" + offlineWithdrawParam + "]");
+        ResponseEntity<ResponseBody<String>> response = null;
+        String errmsg = null;
+
+        ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlineWithdrawParam.getToken());
+
+        //判断交易是否存在
+        if(findMemberResponse.getBody().isSuccess()){
+
+            Member member = findMemberResponse.getBody().getData();
+            //判断用户是否开户
+            if(member.getOpenAccount()){
+
+                Transaction transaction = generate(member.getMemberId(),OFFLINE_WITHDRAW_TYPE,offlineWithdrawParam.getMoney());
+
+                transactionRepository.save(transaction);
+                response = ResponseEntityBuilder.success(transaction.getTransactionId());
+
+            }else {
+                errmsg = "您还未开通交易账户，暂不能交易";
+            }
+
+        }else{
+            errmsg = findMemberResponse.getBody().getMessage();
+        }
+
+        if(errmsg != null){
+            response = ResponseEntityBuilder.failed(errmsg);
+        }
+
+        return response;
     }
+
+    private ArrayList<Predicate> generate(SearchParam searchParam){
+
+
+
+        ArrayList<Predicate> predicateList = new ArrayList<>();
+
+        if(!StringUtils.isEmpty(searchParam.getStatus())){
+            Predicate predicate = transaction.status.eq(searchParam.getStatus());
+            predicateList.add(predicate);
+        }
+
+        if(!StringUtils.isEmpty(searchParam.getType())){
+            Predicate predicate = transaction.type.eq(searchParam.getType());
+            predicateList.add(predicate);
+        }
+
+        if(!StringUtils.isEmpty(searchParam.getUserId())){
+            Predicate predicate = transaction.member.memberId.eq(searchParam.getUserId());
+            predicateList.add(predicate);
+        }
+
+        return predicateList;
+    }
+
+
+
+
 
     @Override
-    public ResponseEntity<Page<Transaction>> findByStatusAndType(String status, String type, int page, int size) {
-        return null;
-    }
-	
-/*
-	@Autowired
-	private UserInfoService userInfoService;
-	
-	@Transactional
-    public ResponseEntity<Transaction> create(String userId, String type, Long money, String status) {
-    	logger.info("-----TransactionServiceImpl/create-----");
-    	logger.info("userID="+userId);
-    	logger.info("type="+type);
-    	logger.info("money="+money);
-    	logger.info("status="+status);
-    	
-    	if(STRING_SUCCESS.equals(status) || money < 0){
-    		ResponseEntity<UserInfo> RE = userInfoService.updateMoney(userId, money);
-    		if(RE.getStatusCode() == HttpStatus.OK){
-    			Transaction tran = new Transaction();
-            	tran.setCreateDate(new Date());
-            	tran.setMoney(money);
-            	tran.setStatus(status);
-            	tran.setType(type);
-            	tran.setUserId(userId);
-            	transactionRepository.save(tran);
-            	
-            	//TODO 发送信息 
-                return new ResponseEntity<Transaction>(HttpStatus.OK);
-    		}else{
-    			return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "余额不足");
-    		}
-    	}else{
-    		Transaction tran = new Transaction();
-        	tran.setCreateDate(new Date());
-        	tran.setMoney(money);
-        	tran.setStatus(status);
-        	tran.setType(type);
-        	tran.setUserId(userId);
-        	transactionRepository.save(tran);
-        	
-        	//TODO 发送信息 （此处应考虑充值时，未支付成功之前不发送短信）
-            return new ResponseEntity<Transaction>(HttpStatus.OK);
-    	}
-    }
+    public  <T>  ResponseEntity<ResponseBody<QueryResults<T>>>  search(SearchParam searchParam,QBean<T> qBean){
 
-	@Transactional
-	@Override
-    public ResponseEntity<Transaction> update(String transactionId,String status,String remark) {
-    	logger.info("-----TransactionServiceImpl/update-----");
-    	logger.info("transactionId="+transactionId);
-    	logger.info("status="+status);
-    	logger.info("remark="+remark);
-    	
-    	Transaction t =transactionRepository.findOne(transactionId);
-    	if(null == t){
-    		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "未查到交易记录");
-    	}
-    	if(STRING_SUCCESS.equals(t.getStatus()) || STRING_FAILED.equals(t.getStatus())){
-    		return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "状态错误");
-    	}
+        logger.info("searchParam = [" + searchParam + "]");
+        ResponseEntity<ResponseBody<QueryResults<T>>> response = null;
 
-    	ResponseEntity<UserInfo>  REUser = null;
-		if(t.getMoney() > 0 && STRING_SUCCESS.equals(status)){
-			REUser = userInfoService.updateMoney(t.getUserId(), t.getMoney());
-		}
-		
-		if(t.getMoney() < 0 && STRING_FAILED.equals(status)){
-			REUser = userInfoService.updateMoney(t.getUserId(), -t.getMoney());
-		}
-		
-		if(null != REUser && (REUser.getStatusCode() == HttpStatus.OK)){
-			transactionRepository.updateStatusByTransactionId(transactionId, status, remark);
-			//TODO 发送信息
-			return new ResponseEntity<Transaction>(HttpStatus.OK);
-		}else{
-			return new ResponseEntityBuilder<Transaction>().builder(HttpStatus.BAD_REQUEST, ERROR, "余额不足");
-		}
-    }
+        ArrayList<Predicate> predicates = generate(searchParam);
+        Predicate[] predicate = new Predicate[predicates.size()];
+        predicates.toArray(predicate);
 
-    @Override
-    public ResponseEntity<Page<Transaction>> findByUserId(String userId,int page,int size) {
-    	logger.info("-----TransactionServiceImpl/findByUserId-----");
-    	logger.info("userId="+userId);
-    	logger.info("page="+page);
-    	logger.info("size="+size);
-    	
-    	Pageable p = new PageRequest(page, size,Direction.DESC,"createDate");
-    	Page<Transaction> reqPage = transactionRepository.findByUserId(userId, p);
-    	
-        return new ResponseEntity<Page<Transaction>>(reqPage,HttpStatus.OK);
+        QueryResults<T> res = jpaQueryFactory.select(qBean)
+                .from(transaction)
+                .where(predicate)
+                .offset(searchParam.getPage())
+                .limit(searchParam.getSize())
+                .orderBy(transaction.transactionId.desc())
+                .fetchResults();
+
+        response = ResponseEntityBuilder.<QueryResults<T>>success(res);
+
+        logger.info("response = " + response);
+        return response;
     }
 
     @Override
-    public ResponseEntity<Page<Transaction>> findByStatusAndType(String status, String type,int page,int size) {
-    	logger.info("-----TransactionServiceImpl/findByStatusAndType-----");
-    	logger.info("status="+status);
-    	logger.info("type="+type);
-    	logger.info("page="+page);
-    	logger.info("size="+size);
-    	
-    	Pageable p = new PageRequest(page, size,Direction.DESC,"createDate");
-    	Page<Transaction> reqPage = transactionRepository.findByStatusAndType(status, type, p);
-    	
-        return new ResponseEntity<Page<Transaction>>(reqPage,HttpStatus.OK);
+    @Transactional
+    public ResponseEntity<ResponseBody<String>> update(UpdateParam updateParam) {
+
+        logger.info("updateParam = [" + updateParam + "]");
+        ResponseEntity<ResponseBody<String>> response = null;
+        String errmsg = null;
+
+        //判断交易是否已经审核过
+        Transaction transaction = transactionRepository.findByTransactionId(updateParam.getTransactionId());
+
+        if(transaction != null) {
+            if(transaction.getUpdateDate() != null || !WAIT_CHECK_STATUS.equals(transaction.getStatus())){
+                errmsg = "交易记录已为完成状态。";
+            }else{
+                transaction.setStatus(updateParam.getSuccess()?SUCCESS_STATUS:FAILED_STATUS);
+                transaction.setUpdateDate(new Date());
+                transactionRepository.save(transaction);
+                response = ResponseEntityBuilder.success(transaction.getTransactionId());
+            }
+        }else{
+            errmsg = "交易不存在";
+        }
+
+
+        if(errmsg != null){
+            response = ResponseEntityBuilder.failed(errmsg);
+        }
+
+        logger.info("response = " + response);
+
+
+        return response;
     }
-*/
+
+
+
+
+
+
 
 }

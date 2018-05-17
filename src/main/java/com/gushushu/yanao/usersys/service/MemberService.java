@@ -1,11 +1,15 @@
 package com.gushushu.yanao.usersys.service;
 
+import com.gushushu.yanao.usersys.common.PageParam;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.SecretEncode;
 import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.model.FrontMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.QBean;
+import javafx.beans.binding.BooleanExpression;
 import org.hibernate.validator.constraints.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,25 +34,12 @@ public interface MemberService {
 
     ResponseEntity<ResponseBody<FrontMemberSession>> login(LoginParam loginParam);
 
-    ResponseEntity<ResponseBody<Page<BackMember>>> search(SearchParam param, Pageable pageable);
+    public <T> ResponseEntity<ResponseBody<QueryResults<T>>> search(SearchParam<T> searchParam);
 
     ResponseEntity<ResponseBody> realName(RealNameParam param);
 
 
 
-    /*
-
-    ResponseEntity<Member> findPassword(String account,String phoneCode,String password);
-
-    ResponseEntity<Member> updatePassword(String userId,String password,String newPassword);
-
-    ResponseEntity<Member> updateEmail(String userId, String password,String email);
-
-
-    ResponseEntity<Member> updateMoney(String userId,Long money);
-
-    ResponseEntity<Member> updateOuterDiscAccount(String userId,String outerDiscAccount);
-*/
 
 
     public static class SetInnerDiscAccountParam{
@@ -178,22 +169,33 @@ public interface MemberService {
         }
     }
 
-    public static class SearchParam {
-        private Boolean waitSetInnerDisc;
+    public static class SearchParam<ResultBean> extends PageParam {
+        private Boolean applyForOpenAccount;
+        private Boolean openAccount;
+        private QBean<ResultBean> resultBean;
 
-        public Boolean getWaitSetInnerDisc() {
-            return waitSetInnerDisc;
+        public QBean<ResultBean> getResultBean() {
+            return resultBean;
         }
 
-        public void setWaitSetInnerDisc(Boolean waitSetInnerDisc) {
-            this.waitSetInnerDisc = waitSetInnerDisc;
+        public void setResultBean(QBean<ResultBean> resultBean) {
+            this.resultBean = resultBean;
         }
 
-        @Override
-        public String toString() {
-            return "SearchParam{" +
-                    "waitSetInnerDisc=" + waitSetInnerDisc +
-                    '}';
+        public Boolean getOpenAccount() {
+            return openAccount;
+        }
+
+        public void setOpenAccount(Boolean openAccount) {
+            this.openAccount = openAccount;
+        }
+
+        public Boolean getApplyForOpenAccount() {
+            return applyForOpenAccount;
+        }
+
+        public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
+            this.applyForOpenAccount = applyForOpenAccount;
         }
     }
 

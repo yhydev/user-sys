@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface MemberRepository extends JpaRepository<Member,String> ,JpaSpecificationExecutor<Member> {
+public interface MemberRepository extends JpaRepository<Member,String> {
 
 
     Long countByAccount(String account);
@@ -20,8 +20,8 @@ public interface MemberRepository extends JpaRepository<Member,String> ,JpaSpeci
 
     Member findByAccount(String account);
 
-    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount) from Member t where t.memberId = :id")
-    FrontMember findFront(@Param("id") String id);
+   // @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount) from Member t where t.memberId = :id")
+ //   FrontMember findFront(@Param("id") String id);
 
     @Query("select t.account from Member t where  t.memberId = :memberId")
     String findAccount(@Param("memberId") String memberId);

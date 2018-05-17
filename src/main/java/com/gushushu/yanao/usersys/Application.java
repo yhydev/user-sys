@@ -3,6 +3,7 @@ package com.gushushu.yanao.usersys;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.gushushu.yanao.usersys.filter.ImageCodeAuthFilter;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +13,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -51,7 +53,10 @@ public class Application {
         return filterRegistrationBean;
     }
 
-
+    @Bean
+    public JPAQueryFactory jpaQueryFactory(@Autowired EntityManager entityManager){
+        return new JPAQueryFactory(entityManager);
+    }
 
     @Bean
     public DefaultKaptcha defaultKaptcha() throws IOException {

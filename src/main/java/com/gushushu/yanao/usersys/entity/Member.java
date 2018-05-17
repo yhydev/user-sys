@@ -30,10 +30,35 @@ public class Member {
     private String idCardBehindUrl; //身份证反面
     private String bankCard;//银行卡
     private String phoneNumber;//银行卡预留手机号
-    private Date realNameTime;//实名时间
+    private Date applyForOpenAccountDate;//实名时间
 
     private String innerDiscAccount;//内盘账户
-    private Date setInnerDiscTime;
+    private Date setInnerDiscDate;//设置内盘账户日期
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "memberId='" + memberId + '\'' +
+                ", account='" + account + '\'' +
+                ", password='" + password + '\'' +
+                ", createDate=" + createDate +
+                ", type='" + type + '\'' +
+                ", status='" + status + '\'' +
+                ", balance=" + balance +
+                ", email='" + email + '\'' +
+                ", applyForOpenAccount=" + applyForOpenAccount +
+                ", openAccount=" + openAccount +
+                ", name='" + name + '\'' +
+                ", idCard='" + idCard + '\'' +
+                ", idCardFrontUrl='" + idCardFrontUrl + '\'' +
+                ", idCardBehindUrl='" + idCardBehindUrl + '\'' +
+                ", bankCard='" + bankCard + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", openAccountDate=" + openAccountDate +
+                ", innerDiscAccount='" + innerDiscAccount + '\'' +
+                ", setInnerDiscDate=" + setInnerDiscDate +
+                '}';
+    }
 
     public Member(String memberId) {
         this.memberId = memberId;
@@ -105,6 +130,22 @@ public class Member {
         this.email = email;
     }
 
+    public Boolean getApplyForOpenAccount() {
+        return applyForOpenAccount;
+    }
+
+    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
+        this.applyForOpenAccount = applyForOpenAccount;
+    }
+
+    public Boolean getOpenAccount() {
+        return openAccount;
+    }
+
+    public void setOpenAccount(Boolean openAccount) {
+        this.openAccount = openAccount;
+    }
+
     public String getName() {
         return name;
     }
@@ -153,12 +194,12 @@ public class Member {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getRealNameTime() {
-        return realNameTime;
+    public Date getOpenAccountDate() {
+        return openAccountDate;
     }
 
-    public void setRealNameTime(Date realNameTime) {
-        this.realNameTime = realNameTime;
+    public void setOpenAccountDate(Date openAccountDate) {
+        this.openAccountDate = openAccountDate;
     }
 
     public String getInnerDiscAccount() {
@@ -169,52 +210,11 @@ public class Member {
         this.innerDiscAccount = innerDiscAccount;
     }
 
-    public Date getSetInnerDiscTime() {
-        return setInnerDiscTime;
+    public Date getSetInnerDiscDate() {
+        return setInnerDiscDate;
     }
 
-    public void setSetInnerDiscTime(Date setInnerDiscTime) {
-        this.setInnerDiscTime = setInnerDiscTime;
-    }
-
-    public Boolean getApplyForOpenAccount() {
-        return applyForOpenAccount;
-    }
-
-    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
-        this.applyForOpenAccount = applyForOpenAccount;
-    }
-
-    public Boolean getOpenAccount() {
-        return openAccount != null && openAccount ;
-    }
-
-    public void setOpenAccount(Boolean openAccount) {
-        this.openAccount = openAccount;
-    }
-
-    @Override
-    public String toString() {
-        return "Member{" +
-                "memberId='" + memberId + '\'' +
-                ", account='" + account + '\'' +
-                ", password='" + password + '\'' +
-                ", createDate=" + createDate +
-                ", type='" + type + '\'' +
-                ", status='" + status + '\'' +
-                ", balance=" + balance +
-                ", email='" + email + '\'' +
-                ", applyForOpenAccount=" + applyForOpenAccount +
-                ", openAccount=" + openAccount +
-                ", name='" + name + '\'' +
-                ", idCard='" + idCard + '\'' +
-                ", idCardFrontUrl='" + idCardFrontUrl + '\'' +
-                ", idCardBehindUrl='" + idCardBehindUrl + '\'' +
-                ", bankCard='" + bankCard + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", realNameTime=" + realNameTime +
-                ", innerDiscAccount='" + innerDiscAccount + '\'' +
-                ", setInnerDiscTime=" + setInnerDiscTime +
-                '}';
+    public void setSetInnerDiscDate(Date setInnerDiscDate) {
+        this.setInnerDiscDate = setInnerDiscDate;
     }
 }
