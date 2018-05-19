@@ -31,8 +31,8 @@ public class MemberController {
     }
 
     @RequestMapping("/openAccount")
-    public ResponseEntity openAccount(@Validated MemberService.RealNameParam realNameParam){
-        return memberService.realName(realNameParam);
+    public ResponseEntity openAccount(@Validated MemberService.ApplyForAccountParam realNameParam){
+        return memberService.applyForAccount(realNameParam);
     }
 
     @RequestMapping("/getFrontMember")

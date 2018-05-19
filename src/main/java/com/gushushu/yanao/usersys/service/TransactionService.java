@@ -12,6 +12,7 @@ import org.hibernate.sql.Select;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 
 import javax.persistence.JoinColumn;
@@ -138,7 +139,9 @@ public interface TransactionService {
 
 
     public static class OfflineWithdrawParam{
+        @NotEmpty
         private String token;
+        @NotEmpty
         private Long money;
 
         @Override
@@ -167,9 +170,13 @@ public interface TransactionService {
     }
 
     public static class OfflinePayParam{
+        @NotEmpty(message = "金额不能为空")
         private Long money;//支付金额
+        @NotEmpty(message = "付款账户不能为空")
         private String payAccount;//交易账户
-        private String receiveAccount;//接收账户
+        @NotEmpty(message = "收款账户不能为空")
+        private String receiveAccountId;//接收账户
+        @NotEmpty(message = "token 不能为空")
         private String token;//交易用户
 
         public String getToken() {
@@ -182,10 +189,10 @@ public interface TransactionService {
 
         @Override
         public String toString() {
-            return "UnderLinePayParam{" +
+            return "OfflinePayParam{" +
                     "money=" + money +
                     ", payAccount='" + payAccount + '\'' +
-                    ", receiveAccount='" + receiveAccount + '\'' +
+                    ", receiveAccountId='" + receiveAccountId + '\'' +
                     ", token='" + token + '\'' +
                     '}';
         }
@@ -206,15 +213,13 @@ public interface TransactionService {
             this.payAccount = payAccount;
         }
 
-        public String getReceiveAccount() {
-            return receiveAccount;
+        public String getReceiveAccountId() {
+            return receiveAccountId;
         }
 
-        public void setReceiveAccount(String receiveAccount) {
-            this.receiveAccount = receiveAccount;
+        public void setReceiveAccountId(String receiveAccountId) {
+            this.receiveAccountId = receiveAccountId;
         }
-
-
     }
 
 

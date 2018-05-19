@@ -125,6 +125,7 @@ public class MemberServiceImplTest {
 
         MemberService.SearchParam searchParam = new MemberService.SearchParam();
         searchParam.setResultBean(MemberServiceImpl.backMemberQBean);
+        searchParam.setApplyForOpenAccount(true);
         memberService.search(searchParam);
 
     }
@@ -138,7 +139,7 @@ public class MemberServiceImplTest {
         logger.info("**********\trealName(Not have Token test)\t**********");
 
 
-        MemberService.RealNameParam realNameParam = new MemberService.RealNameParam();
+        MemberService.ApplyForAccountParam realNameParam = new MemberService.ApplyForAccountParam();
 
         realNameParam.setBankCard("bankCard");
         realNameParam.setIdCard("idCard");
@@ -147,7 +148,7 @@ public class MemberServiceImplTest {
         realNameParam.setIdCardBehindUrl("idCardBehind");
         realNameParam.setIdCardFrontUrl("idCardBack");
 
-        memberService.realName(realNameParam);
+        memberService.applyForAccount(realNameParam);
 
 
         logger.info("**********\trealName(have Token test)\t**********");
@@ -159,7 +160,7 @@ public class MemberServiceImplTest {
 
         if(rb.getBody().isSuccess()){
             realNameParam.setToken(rb.getBody().getData().getToken());
-            memberService.realName(realNameParam);
+            memberService.applyForAccount(realNameParam);
         }
 
 

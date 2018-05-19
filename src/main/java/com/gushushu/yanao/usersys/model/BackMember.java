@@ -7,15 +7,18 @@ public class BackMember {
     private String memberId;
     private String account;//账户 (手机号)
     private Date createDate;// 创建日期
+
     private Boolean applyForOpenAccount;//是否申请开户
     private Boolean openAccount;//是否已经开户
+
     private String name; //姓名
     private String idCard; //身份证
     private String idCardFrontUrl; //身份证正面
     private String idCardBehindUrl; //身份证反面
     private String bankCard;//银行卡
     private String phoneNumber;//银行卡预留手机号
-    private Date openAccountDate;//实名时间
+    private Date applyForOpenAccountDate;//实名时间
+
     private String innerDiscAccount;//内盘账户
     private Date setInnerDiscDate;//设置内盘账户日期
 
@@ -108,12 +111,12 @@ public class BackMember {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getOpenAccountDate() {
-        return openAccountDate;
+    public Date getApplyForOpenAccountDate() {
+        return applyForOpenAccountDate;
     }
 
-    public void setOpenAccountDate(Date openAccountDate) {
-        this.openAccountDate = openAccountDate;
+    public void setApplyForOpenAccountDate(Date applyForOpenAccountDate) {
+        this.applyForOpenAccountDate = applyForOpenAccountDate;
     }
 
     public String getInnerDiscAccount() {

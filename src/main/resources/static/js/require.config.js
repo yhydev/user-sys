@@ -19,14 +19,17 @@ var require = {
         /*服务*/
         "service/member-session":"service/member-session",
         "service/member":"service/member",
+        "service/receive-account":"service/receive-account",
 
         /*组件*/
         "component/upload":"component/upload",
         "component/router":"component/router",
 
+
         /*路由*/
         "router/open-account":"router/open-account",
-        "router/open-deposit":"router/open-deposit"
+        "router/open-deposit":"router/open-deposit",
+        "router/offline-withdraw":"router/offline-withdraw"
     },
     shim:{
         "jquery":{
@@ -71,6 +74,9 @@ var require = {
         },"service/member":{
             exports:"service/member",
             deps:["Promise","jquery"]
+        },"service/receive-account":{
+            exports:"service/receive-account",
+            deps:["jquery"]
         },
 
 
@@ -84,6 +90,8 @@ var require = {
         "router/open-account":{
             exports:"router/open-account",
             deps:["vue","jquery","service/member-session","component/upload","component/router","jquery-form","validator-utils"]
+        },"router/offline-withdraw":{
+            exports:"offlineWithdrawRouter"
         }
 
 

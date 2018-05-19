@@ -86,20 +86,13 @@ public class TransactionServiceImplTest implements AppConstant{
 
         underLinePayParam.setMoney(100L);
         underLinePayParam.setToken(token);
-        underLinePayParam.setReceiveAccount("6212261702013626387");
+        underLinePayParam.setReceiveAccountId("6212261702013626387");
         underLinePayParam.setPayAccount("6212261702013626387");
         transactionService.offlinePay(underLinePayParam);
 
 
 
-        underLinePayParam.setReceiveAccount("2222");
-        underLinePayParam.setPayAccount("1111");
-        transactionService.offlinePay(underLinePayParam);
 
-
-        underLinePayParam.setReceiveAccount("6212261702013626387");
-        underLinePayParam.setPayAccount("6225365271562822");
-        transactionService.offlinePay(underLinePayParam);
 
     }
 
@@ -113,8 +106,8 @@ public class TransactionServiceImplTest implements AppConstant{
 
         underLinePayParam.setMoney(100L);
         underLinePayParam.setToken(token);
-        underLinePayParam.setReceiveAccount("6212261702013626387");
-        underLinePayParam.setPayAccount("6225365271562822");
+        //underLinePayParam.setReceiveAccount("6212261702013626387");
+        underLinePayParam.setPayAccount("62253652715628211");
         ResponseEntity<ResponseBody<String>> offlinePayResponse =  transactionService.offlinePay(underLinePayParam);
 
 

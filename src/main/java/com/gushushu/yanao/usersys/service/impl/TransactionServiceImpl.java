@@ -6,18 +6,16 @@ import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.OfflinePay;
+import com.gushushu.yanao.usersys.entity.ReceiveAccount;
 import com.gushushu.yanao.usersys.entity.Transaction;
 import com.gushushu.yanao.usersys.model.FrontTransaction;
 import com.gushushu.yanao.usersys.repository.OfflinePayRepository;
+import com.gushushu.yanao.usersys.repository.ReceiveAccountRepository;
 import com.gushushu.yanao.usersys.repository.TransactionRepository;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.TransactionService;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.transaction.Transactional;
 import com.gushushu.yanao.usersys.service.ValidateService;
 import com.querydsl.core.QueryResults;
@@ -58,6 +56,8 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
             transaction.detailId
             );
 
+	@Autowired
+	private ReceiveAccountRepository receiveAccountRepository;
 
 	@Autowired
 	private OfflinePayRepository offlinePayRepository;
@@ -96,6 +96,7 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
     }
 
 
+
     @Override
     @Transactional
     public ResponseEntity<ResponseBody<String>> offlinePay(OfflinePayParam offlinePayParam) {
@@ -103,27 +104,34 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
         logger.info("offlinePayParam = [" + offlinePayParam + "]");
         ResponseEntity response = null;
         String errmsg = null;
-        //支付账户和收款账户是否相同
-        if(!offlinePayParam.getPayAccount().equals(offlinePayParam.getReceiveAccount())){
 
-            ResponseEntity<ResponseBody<String>> bankCardResponse = validateService.bankCard(offlinePayParam.getPayAccount());
+        ResponseEntity<ResponseBody<String>> bankCardResponse = validateService.bankCard(offlinePayParam.getPayAccount());
 
             //支付银行卡是否有效
-            if(bankCardResponse.getBody().isSuccess()){
+            if(!bankCardResponse.getBody().isSuccess()){
+                errmsg = bankCardResponse.getBody().getMessage();
+            }else if(receiveAccountRepository.existsByBankNo(offlinePayParam.getPayAccount())) {// 支付银行卡是否存在于收款账户
+                errmsg = "转账银行卡为无效的卡号";
+            }else{
                 ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlinePayParam.getToken());
+                Member member = findMemberResponse.getBody().getData();
 
                 //用户是否存在
-                if(findMemberResponse.getBody().isSuccess()){
+                if(!findMemberResponse.getBody().isSuccess()){
+                    errmsg = findMemberResponse.getBody().getMessage();
+                }else if(!member.getOpenAccount()){//是否开通交易账户
+                    errmsg = "您还未开通交易账户，暂不能交易";
+                }else{
 
-                    Member member = findMemberResponse.getBody().getData();
-
-                    //用户是否开户
-                    if(member.getOpenAccount()){
-
-                        //保存交易详情
+                    ReceiveAccount receiveAccount = receiveAccountRepository.findByReceiveAccountId(offlinePayParam.getReceiveAccountId());
+                    if(receiveAccount == null){
+                        errmsg = "无效的收款人账户";
+                    }else{
                         OfflinePay offlinePay = new OfflinePay();
                         offlinePay.setPayAccount(offlinePayParam.getPayAccount());
-                        offlinePay.setReceiveAccount(offlinePayParam.getReceiveAccount());
+                        offlinePay.setReceiveBankName(receiveAccount.getBankName());
+                        offlinePay.setReceiveBankNo(receiveAccount.getBankNo());
+                        offlinePay.setReceiveUserName(receiveAccount.getUsername());
                         offlinePayRepository.save(offlinePay);
 
                         String memberId = member.getMemberId();
@@ -132,20 +140,12 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
 
                         transactionRepository.save(transaction);
                         response = ResponseEntityBuilder.success(transaction.getTransactionId());
-
-                    }else{
-                        errmsg = "您还未开通交易账户，暂不能交易";
                     }
 
-                }else{
-                    errmsg = findMemberResponse.getBody().getMessage();
                 }
-            }else{
-                errmsg = bankCardResponse.getBody().getMessage();
             }
-        }else{
-            errmsg = "支付账户不能与收款账户相同";
-        }
+
+
 
         if(errmsg != null){
             response = ResponseEntityBuilder.failed(errmsg) ;

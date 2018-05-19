@@ -54,7 +54,7 @@
     },"请输入真实姓名")
 
 
-
+    var bankCards = {};
     $.validator.addMethod("bankCard",function (value,ele) {
 
         var ret = true;
@@ -63,14 +63,21 @@
             return false;
         }
 
+        if(bankCards[value] == true || bankCards[value] == false){
+            ret = bankCards[value];
+        }else{
+            $.ajax({
+                url:"/validate/bankCard?bankCard="+value,
+                async:false,
+                success:function(res){
+                    ret = res.success
+                }
+            })
+            bankCards[value] = ret;
+        }
 
-        $.ajax({
-            url:"/validate/bankCard?bankCard="+value,
-            async:false,
-            success:function(res){
-                ret = res.success
-            }
-        })
+
+
         return ret;
 
     },"请输入有效银行卡号")

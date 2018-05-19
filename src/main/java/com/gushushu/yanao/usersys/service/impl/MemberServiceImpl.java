@@ -39,16 +39,22 @@ public class MemberServiceImpl implements MemberService {
 
     public static QBean<BackMember> backMemberQBean = Projections.bean(
             BackMember.class,
-            member.account,
+            member.memberId,
+            member.account,//账户 (手机号)
+            member.createDate,// 创建日期
+            member.applyForOpenAccount,//是否申请开户
+            member.openAccount,//是否已经开户
             member.name, //姓名
             member.idCard, //身份证
             member.idCardFrontUrl, //身份证正面
             member.idCardBehindUrl, //身份证反面
             member.bankCard,//银行卡
             member.phoneNumber,//银行卡预留手机号
-            member.createDate,//注册时间
-            member.realNameTime //实名认证时间)
+            member.applyForOpenAccountDate,//实名时间
+            member.innerDiscAccount,//内盘账户
+            member.setInnerDiscDate//设置内盘账户日期
     );
+
 
 
     //用户token 超时时间(单位秒)
@@ -75,15 +81,13 @@ public class MemberServiceImpl implements MemberService {
         ResponseEntity<ResponseBody<FrontMember>> response = null;
 
         ResponseEntity<ResponseBody<String>> findMemberIdResponse = memberSessionService.findMemberId(token);
-/*
         if(findMemberIdResponse.getBody().isSuccess()){
             FrontMember frontMember = memberRepository.findFront(findMemberIdResponse.getBody().getData());
             response = ResponseEntityBuilder.success(frontMember);
         }else{
             response = ResponseEntityBuilder.failed(findMemberIdResponse.getBody().getMessage());
-        }*/
+        }
 
-//TODO 待删除
         logger.info("response = " + response);
 
         return response;
@@ -101,7 +105,7 @@ public class MemberServiceImpl implements MemberService {
 
         if(member != null){
 
-            member.setSetInnerDiscTime(new Date());
+            member.setApplyForOpenAccountDate(new Date());
             member.setInnerDiscAccount(setInnerDiscAccountParam.getInnerDiscAccount());
             member.setOpenAccount(true);
             memberRepository.save(member);
@@ -235,13 +239,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<ResponseBody> realName(RealNameParam param) {
+    public ResponseEntity<ResponseBody> applyForAccount(ApplyForAccountParam applyForAccountParam){
 
-        logger.info("param = [" + param + "]");
+        System.out.println("applyForAccountParam = [" + applyForAccountParam + "]");
 
         ResponseEntity response = null;
 
-        ResponseEntity<ResponseBody<Member>> rep = memberSessionService.findMember(param.getToken());
+        ResponseEntity<ResponseBody<Member>> rep = memberSessionService.findMember(applyForAccountParam.getToken());
 
         if(rep.getBody().isSuccess()){
 
@@ -250,13 +254,13 @@ public class MemberServiceImpl implements MemberService {
             if(member.getApplyForOpenAccount()!=null && member.getApplyForOpenAccount()){
                 response = ResponseEntityBuilder.failed("您已经申请开户");
             }else{
-                member.setIdCard(param.getIdCard());
-                member.setName(param.getName());
-                member.setBankCard(param.getBankCard());
-                member.setIdCardBehindUrl(param.getIdCardBehindUrl());
-                member.setIdCardFrontUrl(param.getIdCardFrontUrl());
-                member.setPhoneNumber(param.getPhoneNumber());
-                member.setRealNameTime(new Date());
+                member.setIdCard(applyForAccountParam.getIdCard());
+                member.setName(applyForAccountParam.getName());
+                member.setBankCard(applyForAccountParam.getBankCard());
+                member.setIdCardBehindUrl(applyForAccountParam.getIdCardBehindUrl());
+                member.setIdCardFrontUrl(applyForAccountParam.getIdCardFrontUrl());
+                member.setPhoneNumber(applyForAccountParam.getPhoneNumber());
+                member.setApplyForOpenAccountDate(new Date());
                 member.setApplyForOpenAccount(true);
 
                 memberRepository.save(member);

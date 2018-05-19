@@ -35,6 +35,13 @@ public class Member {
     private String innerDiscAccount;//内盘账户
     private Date setInnerDiscDate;//设置内盘账户日期
 
+    public Member() {
+    }
+
+    public Member(String memberId) {
+        this.memberId = memberId;
+    }
+
     @Override
     public String toString() {
         return "Member{" +
@@ -54,16 +61,10 @@ public class Member {
                 ", idCardBehindUrl='" + idCardBehindUrl + '\'' +
                 ", bankCard='" + bankCard + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", openAccountDate=" + openAccountDate +
+                ", applyForOpenAccountDate=" + applyForOpenAccountDate +
                 ", innerDiscAccount='" + innerDiscAccount + '\'' +
                 ", setInnerDiscDate=" + setInnerDiscDate +
                 '}';
-    }
-
-    public Member(String memberId) {
-        this.memberId = memberId;
-    }
-    public Member() {
     }
 
     public String getMemberId() {
@@ -194,12 +195,12 @@ public class Member {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getOpenAccountDate() {
-        return openAccountDate;
+    public Date getApplyForOpenAccountDate() {
+        return applyForOpenAccountDate;
     }
 
-    public void setOpenAccountDate(Date openAccountDate) {
-        this.openAccountDate = openAccountDate;
+    public void setApplyForOpenAccountDate(Date applyForOpenAccountDate) {
+        this.applyForOpenAccountDate = applyForOpenAccountDate;
     }
 
     public String getInnerDiscAccount() {

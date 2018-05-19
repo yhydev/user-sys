@@ -4,16 +4,16 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
     function validator() {
         $("#offlinePay-form").validate({
             rules:{
-        money:{
-            required:true,
-            digits:true,
-        },payAccount:{
+                money:{
+                    required:true,
+                    digits:true,
+                },payAccount:{
                     bankCard:true
-        },receiveAccountId:{
-            required:true
-        }, token:{
-            required:true
-    }},messages:{
+                },receiveAccountId:{
+                    required:true
+                }, token:{
+                    required:true
+                }},messages:{
                 money:{
                     required:"请输入转账的金额",
                     digits:"请输入合法金额",
@@ -35,27 +35,17 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
             }
         })
     }
-    
-    
-    
+
     return {
-        template:"#deposit-template",
+        props:["profile"],
+        template:"#offline-withdraw-template"
+    }
+   /* return {
+        template:"#offline-withdraw-template",
         data:function () {
             return {
-                memberSession:{},
-                member:{},
-                banks:[]
-                ,activeIndex:null
+                memberSession: {}
             }},
-        methods:{
-            choice:function (index) {
-                if(this.activeIndex != null){
-                    this.banks[this.activeIndex].choice = false;
-                }
-                this.activeIndex = index;
-                this.banks[index].choice = true;
-            }
-        },
         mounted:function () {
 
             var vue = this;
@@ -86,7 +76,7 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
         }
     }
 
+*/
 
 
-    
 });

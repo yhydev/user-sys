@@ -14,18 +14,10 @@ public class OfflinePay{
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid",strategy = "uuid")
     private String offLineId;//线下支付id
-    private String payAccount;//交易账户
-    private String receiveAccount;//接收账户
-
-
-    @Override
-    public String toString() {
-        return "OffLinePay{" +
-                "offLineId='" + offLineId + '\'' +
-                ", payAccount='" + payAccount + '\'' +
-                ", receiveAccount='" + receiveAccount + '\'' +
-                '}';
-    }
+    private String payAccount;//支付账号
+    private String receiveBankNo;//接收账户
+    private String receiveUserName;//收款人名称
+    private String receiveBankName;//收款支行名称
 
     public String getOffLineId() {
         return offLineId;
@@ -43,11 +35,27 @@ public class OfflinePay{
         this.payAccount = payAccount;
     }
 
-    public String getReceiveAccount() {
-        return receiveAccount;
+    public String getReceiveBankNo() {
+        return receiveBankNo;
     }
 
-    public void setReceiveAccount(String receiveAccount) {
-        this.receiveAccount = receiveAccount;
+    public void setReceiveBankNo(String receiveBankNo) {
+        this.receiveBankNo = receiveBankNo;
+    }
+
+    public String getReceiveUserName() {
+        return receiveUserName;
+    }
+
+    public void setReceiveUserName(String receiveUserName) {
+        this.receiveUserName = receiveUserName;
+    }
+
+    public String getReceiveBankName() {
+        return receiveBankName;
+    }
+
+    public void setReceiveBankName(String receiveBankName) {
+        this.receiveBankName = receiveBankName;
     }
 }

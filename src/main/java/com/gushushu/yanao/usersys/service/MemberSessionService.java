@@ -2,7 +2,6 @@ package com.gushushu.yanao.usersys.service;
 
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
-import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;

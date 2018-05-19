@@ -1,3 +1,23 @@
+/*银行卡样式*/
+
+.bank-box{
+    border: 1px solid #ccc;
+    cursor: pointer;
+    height: 54px;
+    padding: 10px;
+    margin: 4px auto;
+    display: block;
+}
+
+.bank-box.active{
+    border: 2px solid #00a2d4;
+}
+
+.bank-box:hover{
+    border-width: 2px;
+
+}
+
 
 .router-view{
     padding: 16px;

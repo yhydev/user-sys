@@ -1,12 +1,13 @@
-require(["jquery","vue","vue-router","router/open-account","router/deposit","service/member-session","component/router","bootstrap"],
-function($,Vue,VueRouter,openAccountRouter,depositRouter,memberSessionService) {
+require(["jquery","vue","vue-router","router/open-account","router/deposit","router/offline-withdraw","service/member-session","service/member","component/router","bootstrap"],
+function($,Vue,VueRouter,openAccountRouter,depositRouter,offlineWithdrawRouter,memberSessionService,memberService) {
 
     Vue.use(VueRouter);
 
 
     var routes = [
         { path: '/openAccount', component: openAccountRouter },
-        {path:"/deposit",component:depositRouter}
+        {path:"/deposit",component:depositRouter},
+        {path:"/offline-withdraw",component:offlineWithdrawRouter}
     ]
 
     var router = new VueRouter({
@@ -19,17 +20,21 @@ function($,Vue,VueRouter,openAccountRouter,depositRouter,memberSessionService) {
         router:router,
         data:function () {
             return {
-                profile:{}
+                profile:{},
             }
         },mounted:function () {
 
-                memberSessionService.memberSession.then(function (res) {
+                memberService.getFrontMember(function (res) {
                     if(!res.success){
                         location.href = "/login.html"
                     }else{
                         app.profile = res.data;
                     }
-                })
+                });
+
+
+
+
 
         }
 

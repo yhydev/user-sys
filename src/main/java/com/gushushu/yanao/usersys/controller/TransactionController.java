@@ -15,6 +15,22 @@ public class TransactionController {
     @Autowired
     private MemberSessionService memberSessionService;
 
+    @Autowired
+    private TransactionService transactionService;
+
+    @RequestMapping("/offlinePay")
+    private ResponseEntity offlinePay(TransactionService.OfflinePayParam offlinePayParam){
+        return transactionService.offlinePay(offlinePayParam);
+    }
+
+    @RequestMapping("/offlineWithdraw")
+    private ResponseEntity offlinePay(TransactionService.OfflineWithdrawParam offlineWithdrawParam){
+        return transactionService.offlineWithdraw(offlineWithdrawParam);
+    }
+
+
+
+
     /*@RequestMapping("/member")
     public ResponseEntity getTransaction(TransactionService.SearchParam searchParam,String token){
 

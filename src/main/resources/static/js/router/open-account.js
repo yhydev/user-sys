@@ -6,7 +6,6 @@ define(["vue","jquery","service/member-session","service/member","component/uplo
     function initializeOpenAccountSubmitValidate() {
 
         $("#openAccount-form").validate({
-            debug:true,
             rules: {
                 token: {required: true},
                 name: {required: true, chineseName: true},
@@ -40,7 +39,7 @@ define(["vue","jquery","service/member-session","service/member","component/uplo
 
 
         return {
-            template:"#open-account-router",
+            template:"#open-account-template",
                 data:function () {
             return {
                 memberSession:{},

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 define(["Promise","jquery","jquery-cookie"],function (Promise,$) {
 
 
@@ -18,11 +12,16 @@ define(["Promise","jquery","jquery-cookie"],function (Promise,$) {
         })
     });
 
-    
-    
+
+
     this.delete = function (success,error) {
-        
+
     }
 
     return this;
 })
+
+
+
+
+

@@ -20,8 +20,8 @@ public interface MemberRepository extends JpaRepository<Member,String> {
 
     Member findByAccount(String account);
 
-   // @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount) from Member t where t.memberId = :id")
- //   FrontMember findFront(@Param("id") String id);
+    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount,t.account) from Member t where t.memberId = :id")
+    FrontMember findFront(@Param("id") String id);
 
     @Query("select t.account from Member t where  t.memberId = :memberId")
     String findAccount(@Param("memberId") String memberId);
@@ -34,8 +34,8 @@ public interface MemberRepository extends JpaRepository<Member,String> {
 
     //@Query("select new com.yanyangpapa.livevideo.model.FrontMember(t.memberId,t.nickname,t.role) from  Member t ")
 
-    @Query("select new com.gushushu.yanao.usersys.model.BackMember(t.account, t.name, t.idCard, t.idCardFrontUrl, t.idCardBehindUrl, t.bankCard, t.phoneNumber, t.createDate, t.realNameTime) from Member t")
-    Page findAll(Specification<Member> specification, Pageable pageable);
+    /*@Query("select new com.gushushu.yanao.usersys.model.BackMember(t.account, t.name, t.idCard, t.idCardFrontUrl, t.idCardBehindUrl, t.bankCard, t.phoneNumber, t.createDate, t.realNameTime) from Member t")
+    Page findAll(Specification<Member> specification, Pageable pageable)*/;
 
 
     /*

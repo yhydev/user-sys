@@ -40,7 +40,7 @@ public class MemberRepositoryTest {
             }
         };
 
-        memberRepository.findAll(specification, PageRequest.of(0,10, Sort.Direction.DESC,"memberId"));
+       // memberRepository.findAll(specification, PageRequest.of(0,10, Sort.Direction.DESC,"memberId"));
 
 
     }

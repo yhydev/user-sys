@@ -36,7 +36,7 @@ public interface MemberService {
 
     public <T> ResponseEntity<ResponseBody<QueryResults<T>>> search(SearchParam<T> searchParam);
 
-    ResponseEntity<ResponseBody> realName(RealNameParam param);
+    ResponseEntity<ResponseBody> applyForAccount(ApplyForAccountParam param);
 
 
 
@@ -71,7 +71,7 @@ public interface MemberService {
         }
     }
 
-    public static class RealNameParam{
+    public static class ApplyForAccountParam{
         @NotEmpty(message = "token 不能为空")
         @Length(message = "token 有误")
         private String token;
