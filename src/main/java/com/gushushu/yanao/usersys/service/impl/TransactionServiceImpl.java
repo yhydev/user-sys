@@ -8,7 +8,9 @@ import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.OfflinePay;
 import com.gushushu.yanao.usersys.entity.ReceiveAccount;
 import com.gushushu.yanao.usersys.entity.Transaction;
+import com.gushushu.yanao.usersys.model.BackTransaction;
 import com.gushushu.yanao.usersys.model.FrontTransaction;
+import com.gushushu.yanao.usersys.model.QueryData;
 import com.gushushu.yanao.usersys.repository.OfflinePayRepository;
 import com.gushushu.yanao.usersys.repository.ReceiveAccountRepository;
 import com.gushushu.yanao.usersys.repository.TransactionRepository;
@@ -33,19 +35,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
+
 import static com.gushushu.yanao.usersys.entity.QTransaction.transaction;
 
 @Service
-public class TransactionServiceImpl implements TransactionService,AppConstant {
+public class TransactionServiceImpl implements TransactionService {
 
 
 
 	final static Logger logger = Logger.getLogger(TransactionServiceImpl.class);
 
     /**
-     * 查找的列，及查询出的对象
+     * 前端用户查找的列，及查询出的对象
      */
-	public static final QBean<FrontTransaction> frontTransactionQBean = Projections.bean(
+	public static final QBean<FrontTransaction> FRONT_TRANSACTION_Q_BEAN = Projections.bean(
 	        FrontTransaction.class,
             transaction.status,
             transaction.type,
@@ -55,6 +59,23 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
             transaction.answer,
             transaction.detailId
             );
+
+
+    /**
+     * 后端用户查找的列，及查询出的对象
+     */
+	public static final QBean<BackTransaction> BACK_TRANSACTION_Q_BEAN = Projections.bean(
+	        BackTransaction.class,
+            transaction.status,
+            transaction.type,
+            transaction.money,
+            transaction.createDate,
+            transaction.updateDate,
+            transaction.answer,
+            transaction.detailId,
+            transaction.member.account,
+            transaction.transactionId
+    );
 
 	@Autowired
 	private ReceiveAccountRepository receiveAccountRepository;
@@ -167,7 +188,7 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
 
         ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlineWithdrawParam.getToken());
 
-        //判断交易是否存在
+        //判断用户是否存在
         if(findMemberResponse.getBody().isSuccess()){
 
             Member member = findMemberResponse.getBody().getData();
@@ -175,7 +196,6 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
             if(member.getOpenAccount()){
 
                 Transaction transaction = generate(member.getMemberId(),OFFLINE_WITHDRAW_TYPE,offlineWithdrawParam.getMoney());
-
                 transactionRepository.save(transaction);
                 response = ResponseEntityBuilder.success(transaction.getTransactionId());
 
@@ -210,8 +230,8 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
             predicateList.add(predicate);
         }
 
-        if(!StringUtils.isEmpty(searchParam.getUserId())){
-            Predicate predicate = transaction.member.memberId.eq(searchParam.getUserId());
+        if(!StringUtils.isEmpty(searchParam.getMemberId())){
+            Predicate predicate = transaction.member.memberId.eq(searchParam.getMemberId());
             predicateList.add(predicate);
         }
 
@@ -223,10 +243,10 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
 
 
     @Override
-    public  <T>  ResponseEntity<ResponseBody<QueryResults<T>>>  search(SearchParam searchParam,QBean<T> qBean){
+    public  <T>  ResponseEntity<ResponseBody<QueryData<T>>>  search(SearchParam searchParam, QBean<T> qBean){
 
         logger.info("searchParam = [" + searchParam + "]");
-        ResponseEntity<ResponseBody<QueryResults<T>>> response = null;
+        ResponseEntity<ResponseBody<QueryData<T>>> response = null;
 
         ArrayList<Predicate> predicates = generate(searchParam);
         Predicate[] predicate = new Predicate[predicates.size()];
@@ -235,12 +255,14 @@ public class TransactionServiceImpl implements TransactionService,AppConstant {
         QueryResults<T> res = jpaQueryFactory.select(qBean)
                 .from(transaction)
                 .where(predicate)
-                .offset(searchParam.getPage())
+                .offset(searchParam.getPage() * searchParam.getSize())
                 .limit(searchParam.getSize())
                 .orderBy(transaction.transactionId.desc())
                 .fetchResults();
 
-        response = ResponseEntityBuilder.<QueryResults<T>>success(res);
+        QueryData<T> ret = new QueryData<T>(res.getResults(),searchParam.getPage(),searchParam.getSize(),res.getTotal());
+
+        response = ResponseEntityBuilder.<QueryData<T>>success(ret);
 
         logger.info("response = " + response);
         return response;

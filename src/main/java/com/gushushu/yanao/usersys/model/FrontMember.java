@@ -12,14 +12,15 @@ public class FrontMember {
     private Boolean applyForOpenAccount;
     private String innerDiscAccount;
     private String account;
+    private String type;
 
 
-
-    public FrontMember(Boolean openAccount, Boolean applyForOpenAccount, String innerDiscAccount,String account) {
+    public FrontMember(Boolean openAccount, Boolean applyForOpenAccount, String innerDiscAccount,String account,String type) {
         this.openAccount = openAccount;
         this.applyForOpenAccount = applyForOpenAccount;
         this.innerDiscAccount = innerDiscAccount;
         this.account = account;
+        this.type = type;
     }
 
     @Override
@@ -29,7 +30,16 @@ public class FrontMember {
                 ", applyForOpenAccount=" + applyForOpenAccount +
                 ", innerDiscAccount='" + innerDiscAccount + '\'' +
                 ", account='" + account + '\'' +
+                ", type='" + type + '\'' +
                 '}';
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getAccount() {

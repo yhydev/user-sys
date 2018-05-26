@@ -82,7 +82,7 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
             })
         },updated:function () {
             validator();
-
+            console.log("deposit updated")
         }
     }
 

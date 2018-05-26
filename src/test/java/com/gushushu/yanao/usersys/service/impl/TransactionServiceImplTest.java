@@ -69,7 +69,7 @@ public class TransactionServiceImplTest implements AppConstant{
         TransactionService.SearchParam searchParam = new TransactionService.SearchParam();
         searchParam.setType(TransactionService.OFFLINE_PAY_TYPE);
 
-        transactionService.search(searchParam,TransactionServiceImpl.frontTransactionQBean);
+        transactionService.search(searchParam,TransactionServiceImpl.FRONT_TRANSACTION_Q_BEAN);
       //  searchParam.set
 
     }

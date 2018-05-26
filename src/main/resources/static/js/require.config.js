@@ -25,11 +25,14 @@ var require = {
         "component/upload":"component/upload",
         "component/router":"component/router",
 
-
         /*路由*/
         "router/open-account":"router/open-account",
         "router/open-deposit":"router/open-deposit",
-        "router/offline-withdraw":"router/offline-withdraw"
+        "router/offline-withdraw":"router/offline-withdraw",
+
+
+        "filter":"filter",
+
     },
     shim:{
         "jquery":{
@@ -77,6 +80,9 @@ var require = {
         },"service/receive-account":{
             exports:"service/receive-account",
             deps:["jquery"]
+        },"service/transaction":{
+            exports:"service/transaction",
+            deps:["jquery"]
         },
 
 
@@ -91,8 +97,19 @@ var require = {
             exports:"router/open-account",
             deps:["vue","jquery","service/member-session","component/upload","component/router","jquery-form","validator-utils"]
         },"router/offline-withdraw":{
-            exports:"offlineWithdrawRouter"
+            exports:"router/offlineWithdraw"
+        },"router/transaction-list":{
+            //TODO deps ..
+            exports:"router/transactionList"
+        },
+
+
+
+        "filter/app-dict":{
+            exports:"filter/app-dict",
+            deps:["vue"]
         }
+
 
 
     }

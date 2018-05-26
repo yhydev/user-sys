@@ -20,7 +20,7 @@ public interface MemberRepository extends JpaRepository<Member,String> {
 
     Member findByAccount(String account);
 
-    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount,t.account) from Member t where t.memberId = :id")
+    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount,t.account,t.type) from Member t where t.memberId = :id")
     FrontMember findFront(@Param("id") String id);
 
     @Query("select t.account from Member t where  t.memberId = :memberId")

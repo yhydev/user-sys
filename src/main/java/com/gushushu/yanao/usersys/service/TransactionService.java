@@ -5,11 +5,12 @@ import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.Transaction;
 import com.gushushu.yanao.usersys.model.FrontTransaction;
-import com.querydsl.core.QueryResults;
+import com.gushushu.yanao.usersys.model.QueryData;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.QBean;
 import org.hibernate.sql.Select;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,7 @@ public interface TransactionService {
 
 
 
-    public  <T>  ResponseEntity<ResponseBody<QueryResults<T>>>  search(SearchParam searchParam,QBean<T> qBean);
+    public  <T>  ResponseEntity<ResponseBody<QueryData<T>>>  search(SearchParam searchParam, QBean<T> qBean);
 
     /**
      * 线下支付
@@ -61,16 +63,25 @@ public interface TransactionService {
 
     public static class SearchParam extends PageParam {
 
-        private String userId;
+        private String memberId;
         private String type;
         private String status;
 
-        public String getUserId() {
-            return userId;
+        @Override
+        public String toString() {
+            return "SearchParam{" +
+                    "memberId='" + memberId + '\'' +
+                    ", type='" + type + '\'' +
+                    ", status='" + status + '\'' +
+                    "} " + super.toString();
         }
 
-        public void setUserId(String userId) {
-            this.userId = userId;
+        public String getMemberId() {
+            return memberId;
+        }
+
+        public void setMemberId(String memberId) {
+            this.memberId = memberId;
         }
 
         public String getType() {
@@ -139,10 +150,12 @@ public interface TransactionService {
 
 
     public static class OfflineWithdrawParam{
-        @NotEmpty
+        @NotEmpty(message = "token 不能为空")
         private String token;
-        @NotEmpty
+        @Range(message = "金额必须在 1 - 99999999 元之间",min = 1,max = 999999999)
+        @NotNull(message = "金额不能为空")
         private Long money;
+
 
         @Override
         public String toString() {
@@ -170,7 +183,8 @@ public interface TransactionService {
     }
 
     public static class OfflinePayParam{
-        @NotEmpty(message = "金额不能为空")
+        @Range(message = "金额必须在 1 - 99999999 元之间",min = 1,max = 999999999)
+        @NotNull(message = "金额不能为空")
         private Long money;//支付金额
         @NotEmpty(message = "付款账户不能为空")
         private String payAccount;//交易账户

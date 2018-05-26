@@ -1,33 +1,31 @@
 package com.gushushu.yanao.usersys.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gushushu.yanao.usersys.serialize.DateSerialize;
-
 import java.util.Date;
 
-public class FrontTransaction {
+public class BackTransaction {
 
     private String status;
     private String type;
     private Long money;
-
-    @JsonSerialize(using = DateSerialize.class)
     private Date createDate;
-    @JsonSerialize(using = DateSerialize.class)
     private Date updateDate;
     private String answer;
     private String detailId;
+    private String account;
+    private String transactionId;
 
     @Override
     public String toString() {
-        return "FrontTransaction{" +
+        return "BackTransaction{" +
                 "status='" + status + '\'' +
                 ", type='" + type + '\'' +
-                ", money='" + money + '\'' +
+                ", money=" + money +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
                 ", answer='" + answer + '\'' +
                 ", detailId='" + detailId + '\'' +
+                ", account='" + account + '\'' +
+                ", transactionId='" + transactionId + '\'' +
                 '}';
     }
 
@@ -85,5 +83,21 @@ public class FrontTransaction {
 
     public void setDetailId(String detailId) {
         this.detailId = detailId;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 }

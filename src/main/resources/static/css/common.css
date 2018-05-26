@@ -1,3 +1,16 @@
+/*导航栏选中样式*/
+.router-link-active,.router-link-active:hover,.router-link-active:active{
+    background-color: #eee!important;
+}
+
+
+/*路由提示样式*/
+.router-notify{
+    text-align: center;
+    margin: 160px auto;
+}
+
+
 /*银行卡样式*/
 
 .bank-box{

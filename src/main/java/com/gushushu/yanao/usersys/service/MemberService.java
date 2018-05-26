@@ -30,7 +30,7 @@ public interface MemberService {
 
     ResponseEntity<ResponseBody<String>> setInnerDiscAccount(SetInnerDiscAccountParam setInnerDiscAccountParam);
 
-    ResponseEntity<ResponseBody<FrontMemberSession>> register(RegisterParam registerParam);
+    ResponseEntity<ResponseBody<FrontMemberSession>> create(CreateParam createParam);
 
     ResponseEntity<ResponseBody<FrontMemberSession>> login(LoginParam loginParam);
 
@@ -199,25 +199,27 @@ public interface MemberService {
         }
     }
 
-    public static class RegisterParam extends LoginParam{
+    public static class CreateParam extends LoginParam{
 
-        @NotBlank(message = "验证码不能为空")
-        private String phoneCode;
-
-        public String getPhoneCode() {
-            return phoneCode;
-        }
-
-        public void setPhoneCode(String phoneCode) {
-            this.phoneCode = phoneCode;
-        }
+        private String type;
 
         @Override
         public String toString() {
-            return "RegisterParam{" +
-                    "phoneCode='" + phoneCode + '\'' +
+            return "CreateParam{" +
+                    "type='" + type + '\'' +
                     "} " + super.toString();
         }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+
+
     }
 
 

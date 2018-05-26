@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.server.ErrorPageRegistrarBeanPostProcessor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -26,18 +25,11 @@ public class Application {
     static Logger logger = Logger.getLogger(Application.class);
 
 
-    @Autowired
 
 
     public static void main(String arg[]){
         ApplicationContext applicationContext = SpringApplication.run(Application.class,arg);
         logger.info(Arrays.toString(applicationContext.getBeanDefinitionNames()));
-
-
-
-
-
-
     }
 
 
@@ -52,6 +44,7 @@ public class Application {
         filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
+
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(@Autowired EntityManager entityManager){
@@ -71,6 +64,38 @@ public class Application {
         return defaultKaptcha;
 
     }
+
+
+
+
+/*
+
+    @Bean
+    public ObjectMapper DateObjectMapper(){
+
+
+        class T extends ObjectMapper{
+            public T(){
+                ObjectMapper factory = new ObjectMapper();
+                factory.addGenericMapping(Date.class, new JsonSerializer<Date>(){
+                    @Override
+                    public void serialize(Date value,
+                                          JsonGenerator jsonGenerator,
+                                          SerializerProvider provider)
+                            throws IOException {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        jsonGenerator.writeString(sdf.format(value));
+                    }
+                });
+                this.setSerializerFactory(factory);
+            }
+        }
+        };
+
+        return new T();
+    }
+*/
+
 
 
 

@@ -14,6 +14,9 @@ public class PageParam {
     }
 
     public Integer getSize() {
+        if(size > 100){
+            return 100;
+        }
         return size;
     }
 
@@ -22,6 +25,9 @@ public class PageParam {
     }
 
     public Integer getPage() {
+        if(page < 0){
+            return 0;
+        }
         return page;
     }
 

@@ -1,13 +1,19 @@
-require(["jquery","vue","vue-router","router/open-account","router/deposit","router/offline-withdraw","service/member-session","service/member","component/router","bootstrap"],
-function($,Vue,VueRouter,openAccountRouter,depositRouter,offlineWithdrawRouter,memberSessionService,memberService) {
+require(["vue","vue-router","router/open-account","router/deposit","router/offline-withdraw","router/transaction-list","service/member-session","service/member","bootstrap"],
+function(Vue,VueRouter,openAccountRouter,depositRouter,offlineWithdrawRouter,transactionListRouter,memberSessionService,memberService) {
 
     Vue.use(VueRouter);
+
+
 
 
     var routes = [
         { path: '/openAccount', component: openAccountRouter },
         {path:"/deposit",component:depositRouter},
-        {path:"/offline-withdraw",component:offlineWithdrawRouter}
+        {path:"/offline-withdraw",component:offlineWithdrawRouter},
+        {path:"/transaction-list",component:transactionListRouter},
+        {path:"/online-deposit",component:{template:"#online-deposit-template"}},
+        {path:"/online-withdraw",component:{template:"#online-withdraw-template"}},
+        {path: "/", redirect: "/transaction-list"}
     ]
 
     var router = new VueRouter({
@@ -21,23 +27,24 @@ function($,Vue,VueRouter,openAccountRouter,depositRouter,offlineWithdrawRouter,m
         data:function () {
             return {
                 profile:{},
+                token:""
+            }
+        },methods:{
+            quit:function () {
+                $.cookie("token",null);
+                location.reload()
             }
         },mounted:function () {
 
+
+                memberSessionService.memberSession.then(function (value) {
+                    app.token = value.data.token;
+                })
+
                 memberService.getFrontMember(function (res) {
-                    if(!res.success){
-                        location.href = "/login.html"
-                    }else{
-                        app.profile = res.data;
-                    }
+                    app.profile = res.data;
                 });
-
-
-
-
-
-        }
-
+            }
     }).$mount("#app");
 
 

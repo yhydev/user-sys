@@ -37,6 +37,9 @@ public class MemberServiceImpl implements MemberService {
 
     final static Logger logger = Logger.getLogger(MemberServiceImpl.class);
 
+    public final static String USER_TYPE = "user";
+    public final static String MANAGER_TYPE = "manager";
+
     public static QBean<BackMember> backMemberQBean = Projections.bean(
             BackMember.class,
             member.memberId,
@@ -122,48 +125,36 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<ResponseBody<FrontMemberSession>> register(RegisterParam param) {
+    public ResponseEntity<ResponseBody<FrontMemberSession>> create(CreateParam createParam) {
 
-        logger.info("param = [" + param + "]");
+        logger.info("createParam = [" + createParam + "]");
 
         ResponseEntity<ResponseBody<FrontMemberSession>> response = null;
+        String errmsg = null;
+        Long accountCount = memberRepository.countByAccount(createParam.getAccount());
 
-        //验证码 验证
-        IdentifyingCodeService.ValidateParam validateParam = new IdentifyingCodeService.ValidateParam();
-        validateParam.type = "register";
-        validateParam.phone = param.getAccount();
-        validateParam.code = param.getPhoneCode();
-
-        ResponseEntity<ResponseBody<IdentifyingCode>> responseEntity = identifyingCodeService.validate(validateParam);
-
-        //验证码是否正确
-        if(responseEntity.getBody().isSuccess()){
-
-            Long accountCount = memberRepository.countByAccount(param.getAccount());
-
-            if(accountCount != 0){
-
-                //验证码错误
-                String errmsg = "此手机号已被注册.";
-                response = ResponseEntityBuilder.failed(errmsg);
-            }else{
-
-                //验证码正确
-
-                Member member = new Member();
-                member.setCreateDate(new Date());
-                member.setPassword(param.getPassword());
-                member.setAccount(param.getAccount());
-                member.setBalance(0L);
-                member.setOpenAccount(false);
-                member.setApplyForOpenAccount(false);
-                memberRepository.save(member);
-
-                response = memberSessionService.saveSession(member.getMemberId());
-            }
+        //手机号是否存在
+        if(accountCount != 0){
+            errmsg = "此手机号已被注册.";
         }else{
-            response = ResponseEntityBuilder.failed(responseEntity.getBody().getMessage());
+            Member member = new Member();
+            member.setCreateDate(new Date());
+            member.setPassword(createParam.getPassword());
+            member.setAccount(createParam.getAccount());
+            member.setBalance(0L);
+            member.setOpenAccount(false);
+            member.setApplyForOpenAccount(false);
+            member.setType(createParam.getType());
+            memberRepository.save(member);
+
+            response = memberSessionService.saveSession(member.getMemberId());
         }
+
+
+        if(errmsg != null){
+            response = ResponseEntityBuilder.failed(errmsg);
+        }
+
 
         logger.info("response = " + response);
 
