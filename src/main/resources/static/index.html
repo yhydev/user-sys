@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>首页</title>
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/common.css" rel="stylesheet">
     <link href="/plugins/webuploader-0.1.5/webuploader.css" rel="stylesheet">
 </head>
@@ -62,7 +61,7 @@
                             <router-link v-clock to="/openAccount">内盘期货开户</router-link>
                         </li>
                         <li>
-                            <router-link v-clock to="/deposit">线下内盘入金</router-link>
+                            <router-link v-clock to="/offline-deposit">线下内盘入金</router-link>
                         </li>
                         <li>
                             <router-link v-clock to="/offline-withdraw">线下内盘出金</router-link>
@@ -117,41 +116,6 @@
     <!--Router end-->
 </div>
 
-<!--router template-->
-
-<script type="text/x-template" id="router-template">
-    <div v-clock  class="col-md-8 col-md-offset-2 column">
-
-        <div class="row">
-            <slot name="title"></slot>
-        </div>
-        <hr>
-        <div class="row">
-            <slot name="content"></slot>
-        </div>
-        <hr>
-        <div class="row">
-            <slot name="foot">
-            </slot>
-        </div>
-    </div>
-</script>
-<!--router template end-->
-
-<!--member template-->
-<script type="text/x-template" id="user-template">
-    <router-template>
-        <slot slot="title" name="title">
-        </slot>
-        <slot slot="content" name="content">
-        </slot>
-
-        <p slot="foot">如果您在操作过程中遇到问题，请致电 7 * 24 小时电话：037993483728</p>
-    </router-template>
-
-</script>
-<!--member template end-->
-
 
 
 <!--online deposit template-->
@@ -173,7 +137,7 @@
     <user-template>
         <h1 slot="title">在线内盘入金</h1>
         <div slot="content" class="router-notify">
-            <p>此功能正在开发中,你可以先使用免手续费的&nbsp;&nbsp;<router-link to="/deposit">线下内盘入金</router-link></p>
+            <p>此功能正在开发中,你可以先使用免手续费的&nbsp;&nbsp;<router-link to="/offline-deposit">线下内盘入金</router-link></p>
         </div>
     </user-template>
 
@@ -247,26 +211,8 @@
 </script>
 <!--transaction list template-->
 
-
-<!--pageable template-->
-<script type="text/x-template" id="pageable-template">
-    <ul class="pagination pull-right">
-
-        <li >
-            <a href="javascript:void(0)" v-on:click="go(page-1)">上一页</a>
-        </li>
-        <li>
-            <a href="javascript:void(0)">{{page+1}}&nbsp;/&nbsp;{{pageTotal+1}}</a>
-        </li>
-        <li>
-            <a href="javascript:void(0)" v-on:click="go(page+1)">下一页</a>
-        </li>
-    </ul>
-</script>
-<!--pageable template end-->
-
-<!--deposit-template-->
-<script type="text/x-template" id="deposit-template">
+<!--offline deposit-template-->
+<script type="text/x-template" id="offline-deposit-template">
 
     <user-template>
 
@@ -276,11 +222,13 @@
 
             <div slot="content">
 
-                <div v-if="member.openAccount == false"  >
+                <div v-if="profile.openAccount == false"  >
                     <no-open-account-template></no-open-account-template>
                 </div>
 
-                <div v-if="member.openAccount == true" class="col-md-4 col-md-offset-4">
+                <div v-if="profile.openAccount == true" class="col-md-4 col-md-offset-4">
+                    <modal-template :message="message">
+                    </modal-template>
                     <form role="form" id="offlinePay-form" action="/transaction/offlinePay">
                         <div class="form-group">
                             <label>收款银行</label>
@@ -308,7 +256,7 @@
 
                         <div class="form-group">
                             <label>转账银行卡号</label><input name="payAccount" type="text" class="form-control" />
-                            <input name="token" type="hidden" v-model="memberSession.token">
+                            <input name="token" type="hidden" v-model="token">
                         </div>
 
 
@@ -325,7 +273,7 @@
 
     </user-template>
 </script>
-<!--deposit-template end-->
+<!--offline deposit-template end-->
 
 <!--offline withdraw-->
 <script type="text/x-template" id="offline-withdraw-template">
@@ -334,6 +282,8 @@
         <div slot="content">
             <no-open-account-template v-if="profile.openAccount == false"></no-open-account-template>
             <div v-if="profile.openAccount == true" class="col-md-4 col-md-offset-4">
+                <modal-template :message="message">
+                </modal-template>
             <form id="offlineWithdraw-form" action="/transaction/offlineWithdraw">
                     <div class="form-group">
                         <label>金额(元)</label><input type="text" class="form-control" name="money" />
@@ -350,27 +300,27 @@
 <!--open account template-->
 <script type="text/x-template" id="open-account-template">
 
-
             <user-template>
                 <h2 slot="title">内盘期货开户</h2>
                 <div slot="content">
 
-                    <div v-if="member.applyForOpenAccount == true" style="margin: 100px">
-                        <div v-if="member.openAccount == true" style="text-align: center;padding:50px" >
-                            <p>您的期货账号为：{{member.innerDiscAccount}}</p>
+                    <div v-if="profile.applyForOpenAccount == true" style="margin: 100px">
+                        <div v-if="profile.openAccount == true" style="text-align: center;padding:50px" >
+                            <p>您的期货账号为：{{profile.innerDiscAccount}}</p>
                         </div>
 
-                        <div v-if="member.openAccount == false" style="text-align: center;padding:50px" >
+                        <div v-if="profile.openAccount == false" style="text-align: center;padding:50px" >
                             <p>您的申请已提交，我们会在1-2 个工作日为您开户，请注意您的手机电话，短信通知。</p>
                         </div>
                     </div>
 
                     <div class="col-md-4 col-md-offset-4">
-                        <form  v-if="member.applyForOpenAccount == false"  role="form" action="/member/openAccount" id="openAccount-form">
+
+                        <form  v-if="profile.applyForOpenAccount == false"  role="form" action="/member/openAccount" id="openAccount-form">
 
                             <div class="form-group">
                                 <label >姓名</label><input type="text" name="name" class="form-control" />
-                                <input type="hidden" v-model="memberSession.token" name="token"/>
+                                <input type="hidden" v-model="token" name="token"/>
                             </div>
 
                             <div class="form-group">
@@ -400,11 +350,8 @@
                 </div>
             </user-template>
 
-
-
     </script>
 <!--open account template end -->
-
 
     <script src="/js/require.config.js"></script>
     <script  src="https://cdn.bootcss.com/require.js/2.3.5/require.min.js" data-main="/js/index.js"></script>

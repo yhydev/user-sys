@@ -1,5 +1,8 @@
 package com.gushushu.yanao.usersys.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gushushu.yanao.usersys.serialize.DateSerialize;
+
 import java.util.Date;
 
 public class BackTransaction {
@@ -7,7 +10,9 @@ public class BackTransaction {
     private String status;
     private String type;
     private Long money;
+    @JsonSerialize(using = DateSerialize.class)
     private Date createDate;
+    @JsonSerialize(using = DateSerialize.class)
     private Date updateDate;
     private String answer;
     private String detailId;

@@ -2,11 +2,14 @@ package com.gushushu.yanao.usersys.controller;
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
+import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
+import com.gushushu.yanao.usersys.service.impl.MemberServiceImpl;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +46,8 @@ public class MemberController {
             return responseEntity;
         }
 
+        
+        createParam.setType(MemberServiceImpl.USER_TYPE);
         return memberService.create(createParam);
     }
 
@@ -56,7 +61,12 @@ public class MemberController {
         return memberService.applyForAccount(realNameParam);
     }
 
-
+    //TODO 管理员权限
+    @RequestMapping("/getMemberList")
+    public ResponseEntity openAccountList(MemberService.SearchParam<BackMember> searchParam){
+        searchParam.setResultBean(MemberServiceImpl.BACK_MEMBER_QBEAN);
+        return memberService.search(searchParam);
+    }
 
 
     @RequestMapping("/getFrontMember")
@@ -65,5 +75,11 @@ public class MemberController {
     }
 
 
+
+    //TODO 管理员权限
+    @RequestMapping("/setInnerDiscAccount")
+    public ResponseEntity setInnerDiscAccount(@Validated MemberService.SetInnerDiscAccountParam setInnerDiscAccountParam){
+        return memberService.setInnerDiscAccount(setInnerDiscAccountParam);
+    }
 
 }

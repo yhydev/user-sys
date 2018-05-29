@@ -1,7 +1,10 @@
 require(["jquery","service/member","jquery-validator","jquery-form","jquery-cookie"],function ($,memberService) {
 
-    memberService.getFrontMember(function (res) {
-        console.log(res)
+    memberService.getFrontMember.then(function (res) {
+        if(res.data.type == "manager"){
+            location.href = "/manager_index.html"
+        }
+    }).catch(function (reason) {
     })
 
 
@@ -39,7 +42,7 @@ require(["jquery","service/member","jquery-validator","jquery-form","jquery-cook
                 success:function(res){
                     if(res.success){
                         $.cookie("token",res.data.token,{expired:7})
-                        location.href = "/admin_index.html";
+                        location.href = "/manager_index.html";
                     }else{
                         alert(res.message)
                     }

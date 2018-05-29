@@ -1,11 +1,15 @@
 package com.gushushu.yanao.usersys.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gushushu.yanao.usersys.serialize.DateSerialize;
+
 import java.util.Date;
 
 public class BackMember {
 
     private String memberId;
     private String account;//账户 (手机号)
+    @JsonSerialize(using = DateSerialize.class)
     private Date createDate;// 创建日期
 
     private Boolean applyForOpenAccount;//是否申请开户
@@ -17,9 +21,11 @@ public class BackMember {
     private String idCardBehindUrl; //身份证反面
     private String bankCard;//银行卡
     private String phoneNumber;//银行卡预留手机号
+    @JsonSerialize(using = DateSerialize.class)
     private Date applyForOpenAccountDate;//实名时间
 
     private String innerDiscAccount;//内盘账户
+    @JsonSerialize(using = DateSerialize.class)
     private Date setInnerDiscDate;//设置内盘账户日期
 
 

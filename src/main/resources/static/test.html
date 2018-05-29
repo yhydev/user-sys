@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<div id="app">
+<div>
+
+    {{test}}
+</div>
+</div>
+<script src="https://cdn.bootcss.com/vue/2.5.17-beta.0/vue.min.js"></script>
+<script>
+
+
+
+    var minix2 = {
+        template:`<a v-on:click="alert()">点击我2</a>`,
+        methods:{
+            alert:function () {
+                alert("2")
+            }
+        }
+    }
+
+    var minix = {
+        template:`<a v-on:click="alert()">点击我1</a>`,
+        methods:{
+            alert:function () {
+                alert("1")
+            }
+        }
+    }
+
+
+
+    new Vue({
+        components:{
+            modal:minix2
+        },data:{
+            test:"222"
+        }
+    }).$mount("#app")
+
+
+
+    new Vue({
+        components:{
+            modal:minix2
+        },data:{
+            test:"111"
+        }
+    }).$mount("#app")
+
+    console.log(Vue.config.optionMergeStrategies)
+
+
+
+</script>
+
+
+</body>
+</html>

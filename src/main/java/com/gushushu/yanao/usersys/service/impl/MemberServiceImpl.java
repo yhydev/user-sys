@@ -8,6 +8,7 @@ import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.model.FrontMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
+import com.gushushu.yanao.usersys.model.QueryData;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
@@ -40,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
     public final static String USER_TYPE = "user";
     public final static String MANAGER_TYPE = "manager";
 
-    public static QBean<BackMember> backMemberQBean = Projections.bean(
+    public static QBean<BackMember> BACK_MEMBER_QBEAN = Projections.bean(
             BackMember.class,
             member.memberId,
             member.account,//账户 (手机号)
@@ -103,19 +104,27 @@ public class MemberServiceImpl implements MemberService {
         logger.info("setInnerDiscAccountParam = [" + setInnerDiscAccountParam + "]");
 
         ResponseEntity<ResponseBody<String>> response = null;
+        String errmsg = null;
 
-        Member member = memberRepository.findByMemberId(setInnerDiscAccountParam.getAccountId());
+        Member member = memberRepository.findByMemberId(setInnerDiscAccountParam.getMemberId());
 
-        if(member != null){
-
+        if(member == null){
+            errmsg = "未知 member";
+        }else if(!member.getApplyForOpenAccount()){
+            errmsg = "用户未实名";
+        }else if(member.getOpenAccount()){
+            errmsg = "用户已开户";
+        } else{
             member.setApplyForOpenAccountDate(new Date());
             member.setInnerDiscAccount(setInnerDiscAccountParam.getInnerDiscAccount());
             member.setOpenAccount(true);
             memberRepository.save(member);
-            response = ResponseEntityBuilder.success(null);
+            response = ResponseEntityBuilder.success(member.getMemberId());
 
-        }else{
-            response = ResponseEntityBuilder.failed("unknown member");
+        }
+
+        if(errmsg != null){
+            response = ResponseEntityBuilder.failed(errmsg);
         }
 
         logger.info("response = " + response);
@@ -203,11 +212,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public <T> ResponseEntity<ResponseBody<QueryResults<T>>> search(SearchParam<T> searchParam) {
+    public <T> ResponseEntity<ResponseBody<QueryData<T>>> search(SearchParam<T> searchParam) {
 
         System.out.println("searchParam = " + searchParam);
 
-        ResponseEntity<ResponseBody<QueryResults<T>>> response;
+        ResponseEntity<ResponseBody<QueryData<T>>> response;
 
         List<Predicate> predicates = generatePredicate(searchParam);
         Predicate[] predicateArray = new Predicate[predicates.size()];
@@ -216,12 +225,13 @@ public class MemberServiceImpl implements MemberService {
         QueryResults<T> queryResults = jpaQueryFactory.select(searchParam.getResultBean())
                 .from(member)
                 .where(predicateArray)
-                .offset(searchParam.getPage())
+                .offset(searchParam.getSize() * searchParam.getPage())
                 .limit(searchParam.getSize())
                 .orderBy(member.memberId.asc())
                 .fetchResults();
-
-        response = ResponseEntityBuilder.<QueryResults<T>>success(queryResults);
+        QueryData<T> queryData = new QueryData<T>(queryResults.getResults()
+                ,searchParam.getPage(),searchParam.getSize(),queryResults.getTotal());
+        response = ResponseEntityBuilder.<QueryData<T>>success(queryData);
 
         logger.info("response = " + response);
 
@@ -233,7 +243,7 @@ public class MemberServiceImpl implements MemberService {
     public ResponseEntity<ResponseBody> applyForAccount(ApplyForAccountParam applyForAccountParam){
 
         System.out.println("applyForAccountParam = [" + applyForAccountParam + "]");
-
+        String errmsg = null;
         ResponseEntity response = null;
 
         ResponseEntity<ResponseBody<Member>> rep = memberSessionService.findMember(applyForAccountParam.getToken());
@@ -241,26 +251,37 @@ public class MemberServiceImpl implements MemberService {
         if(rep.getBody().isSuccess()){
 
             Member member = rep.getBody().getData();
-
             if(member.getApplyForOpenAccount()!=null && member.getApplyForOpenAccount()){
-                response = ResponseEntityBuilder.failed("您已经申请开户");
+                errmsg = "您已经申请开户";
             }else{
-                member.setIdCard(applyForAccountParam.getIdCard());
-                member.setName(applyForAccountParam.getName());
-                member.setBankCard(applyForAccountParam.getBankCard());
-                member.setIdCardBehindUrl(applyForAccountParam.getIdCardBehindUrl());
-                member.setIdCardFrontUrl(applyForAccountParam.getIdCardFrontUrl());
-                member.setPhoneNumber(applyForAccountParam.getPhoneNumber());
-                member.setApplyForOpenAccountDate(new Date());
-                member.setApplyForOpenAccount(true);
+                Long idCardCount = memberRepository.countByIdCard(applyForAccountParam.getIdCard());
 
-                memberRepository.save(member);
+                //判断此身份证是否开户
+                if(idCardCount > 0){
+                    errmsg = "此身份证号已开户,请更换身份证号码";
+                }else{
 
-                response = ResponseEntityBuilder.success(null);
+                    member.setIdCard(applyForAccountParam.getIdCard());
+                    member.setName(applyForAccountParam.getName());
+                    member.setBankCard(applyForAccountParam.getBankCard());
+                    member.setIdCardBehindUrl(applyForAccountParam.getIdCardBehindUrl());
+                    member.setIdCardFrontUrl(applyForAccountParam.getIdCardFrontUrl());
+                    member.setPhoneNumber(applyForAccountParam.getPhoneNumber());
+                    member.setApplyForOpenAccountDate(new Date());
+                    member.setApplyForOpenAccount(true);
+
+                    memberRepository.save(member);
+
+                    response = ResponseEntityBuilder.success(null);
+                }
             }
 
         }else{
-            response = ResponseEntityBuilder.failed(rep.getBody().getMessage());
+            errmsg = rep.getBody().getMessage();
+        }
+
+        if(errmsg != null){
+            response = ResponseEntityBuilder.failed(errmsg);
         }
 
         logger.info("response = " + response);

@@ -7,12 +7,14 @@ import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.model.FrontMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
+import com.gushushu.yanao.usersys.model.QueryData;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.QBean;
 import javafx.beans.binding.BooleanExpression;
 import org.hibernate.validator.constraints.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 
 import javax.persistence.Entity;
@@ -34,7 +36,7 @@ public interface MemberService {
 
     ResponseEntity<ResponseBody<FrontMemberSession>> login(LoginParam loginParam);
 
-    public <T> ResponseEntity<ResponseBody<QueryResults<T>>> search(SearchParam<T> searchParam);
+    public <T> ResponseEntity<ResponseBody<QueryData<T>>> search(SearchParam<T> searchParam);
 
     ResponseEntity<ResponseBody> applyForAccount(ApplyForAccountParam param);
 
@@ -43,23 +45,26 @@ public interface MemberService {
 
 
     public static class SetInnerDiscAccountParam{
-        private String accountId;
+
+        @NotEmpty(message = "用户id不能为空")
+        private String memberId;
+        @NotEmpty(message = "内盘账户不能为空")
         private String innerDiscAccount;
 
         @Override
         public String toString() {
             return "SetInnerDiscAccountParam{" +
-                    "accountId='" + accountId + '\'' +
+                    "memberId='" + memberId + '\'' +
                     ", innerDiscAccount='" + innerDiscAccount + '\'' +
                     '}';
         }
 
-        public String getAccountId() {
-            return accountId;
+        public String getMemberId() {
+            return memberId;
         }
 
-        public void setAccountId(String accountId) {
-            this.accountId = accountId;
+        public void setMemberId(String memberId) {
+            this.memberId = memberId;
         }
 
         public String getInnerDiscAccount() {

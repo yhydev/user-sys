@@ -257,7 +257,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .where(predicate)
                 .offset(searchParam.getPage() * searchParam.getSize())
                 .limit(searchParam.getSize())
-                .orderBy(transaction.transactionId.desc())
+                .orderBy(transaction.createDate.desc())
                 .fetchResults();
 
         QueryData<T> ret = new QueryData<T>(res.getResults(),searchParam.getPage(),searchParam.getSize(),res.getTotal());

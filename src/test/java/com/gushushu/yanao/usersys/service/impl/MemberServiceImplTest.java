@@ -1,3 +1,4 @@
+/*
 package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.Application;
@@ -188,4 +189,4 @@ public class MemberServiceImplTest {
     }
 
 
-}
+}*/

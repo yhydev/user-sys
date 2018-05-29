@@ -1,14 +1,14 @@
-define(["vue","jquery","service/member-session","service/member","service/receive-account","component/upload","component/router",
-    "jquery-form","validator-utils"],function (Vue,$,memberSessionService,memberService,receiveAccountService) {
+define(["vue","jquery","component/widget","service/receive-account","component/upload","component/router",
+    "jquery-form","validator-utils"],function (Vue,$,widgetComponent,receiveAccountService) {
 
-    function validator() {
+    function validator(vue) {
         $("#offlinePay-form").validate({
             rules:{
         money:{
             required:true,
             digits:true,
         },payAccount:{
-                    bankCard:true
+            bankCard:true
         },receiveAccountId:{
             required:true
         }, token:{
@@ -27,9 +27,14 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
             },submitHandler:function (form) {
                 $(form).ajaxSubmit(function (res) {
                     if(res.success){
-                        alert("提交成功，请注意您的手机短信及电话，工作人员会在一个工作日内为您完成入金。")
+                        vue.c_alert(
+                            {
+                                message:"入金申请提交成功，我们会在2个工作日内为您处理出金，请留意您的电话和短信。"
+                            }).on("hide.bs.modal",function () {
+                            vue.$router.push({path:"/transaction-list"})
+                        });
                     }else{
-                        alert(res.message)
+                        vue.c_alert({message:res.message});
                     }
                 })
             }
@@ -39,14 +44,13 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
     
     
     return {
-        template:"#deposit-template",
+        mixins:[widgetComponent],
+        template:"#offline-deposit-template",
         data:function () {
             return {
-                memberSession:{},
-                member:{},
-                banks:[]
-                ,activeIndex:null
-            }},
+                banks:[],
+                activeIndex:null
+            }},props:["token","profile"],
         methods:{
             choice:function (index) {
                 if(this.activeIndex != null){
@@ -72,17 +76,8 @@ define(["vue","jquery","service/member-session","service/member","service/receiv
             })
 
 
-
-            memberSessionService.memberSession.then(function (res) {
-                vue.memberSession = res.data;
-            })
-
-            memberService.getFrontMember(function (res) {
-                vue.member = res.data;
-            })
         },updated:function () {
-            validator();
-            console.log("deposit updated")
+            validator(this);
         }
     }
 

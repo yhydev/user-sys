@@ -6,29 +6,47 @@
 
 define(["Promise","jquery","service/member-session"],function (Promise,$,memberSessionService) {
 
-    function nop() {
-        
-    }
-    this.getFrontMember = function (success,error) {
-        memberSessionService.memberSession.then(function (memberSession) {
+    /**
+     * get current login member info
+     */
+    var getFrontMember = new Promise(function (resolve,reject) {
+        //TODO 不使用缓存
+            memberSessionService.memberSession.then(function (memberSession) {
+                if(memberSession.success){
+                    $.ajax({
+                        data:$.param(memberSession.data),
+                        url:"/member/getFrontMember",
+                        success:resolve,
+                        error:reject
+                    })
+                }else{
+                    reject(memberSession)
+                }
+            }).catch(function (reason) {
+                reject(reason)
+            })
+    });
 
-            success =success?success:nop
-            error =error?error:nop;
-
-            if(memberSession.success){
-                $.ajax({
-                    url:"/member/getFrontMember?"+$.param(memberSession.data),
-                    success:success,
-                    error:error
-                })
-            }else{
-                success(memberSession)
-            }
+    var getMemberList = function (data) {
+        return new Promise(function (resolve,reject) {
+            $.ajax({
+                data:data,
+                url:"/member/getMemberList",
+                success:function (res) {
+                    if(res.success){
+                        resolve(res)
+                    }else{
+                        reject(res)
+                    }
+                },
+                error:reject
+            })
         })
-        
-
     }
 
 
-    return this;
+    return {
+        getFrontMember:getFrontMember,
+        getMemberList:getMemberList
+    };
 })

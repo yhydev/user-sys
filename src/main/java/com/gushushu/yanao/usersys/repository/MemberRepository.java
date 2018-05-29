@@ -16,6 +16,10 @@ public interface MemberRepository extends JpaRepository<Member,String> {
 
     Long countByAccount(String account);
 
+    Long countByType(String type);
+
+    Long countByIdCard(String idCard);
+
     Member findByMemberId(String memberId);
 
     Member findByAccount(String account);

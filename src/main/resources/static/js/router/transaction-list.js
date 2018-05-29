@@ -1,5 +1,6 @@
 define(["vue","jquery","service/transaction","component/router","jquery-form","validator-utils","filter/app-dict"],function (Vue,$,transactionService) {
 
+    
 
     return {
         /*props:["profile"],*/
@@ -10,10 +11,10 @@ define(["vue","jquery","service/transaction","component/router","jquery-form","v
             }
         },watch: {
             "$route":function () {
-                this.reload()
+                this.load()
             }
         },methods:{
-          reload:function () {
+          load:function () {
               var vue = this;
               transactionService.list(this.$route.query).then(function (value) {
                   if(value.success){
@@ -21,8 +22,8 @@ define(["vue","jquery","service/transaction","component/router","jquery-form","v
                   }
               })
           }  
-        },created:function () {
-            this.reload()
+        },mounted:function () {
+            this.load()
         }
     }
 });
