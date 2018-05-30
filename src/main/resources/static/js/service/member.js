@@ -1,16 +1,10 @@
-
-
-
-
-
-
 define(["Promise","jquery","service/member-session"],function (Promise,$,memberSessionService) {
 
     /**
      * get current login member info
      */
-    var getFrontMember = new Promise(function (resolve,reject) {
-        //TODO 不使用缓存
+    var getFrontMember = function () {
+        return new Promise(function (resolve,reject) {
             memberSessionService.memberSession.then(function (memberSession) {
                 if(memberSession.success){
                     $.ajax({
@@ -25,8 +19,27 @@ define(["Promise","jquery","service/member-session"],function (Promise,$,memberS
             }).catch(function (reason) {
                 reject(reason)
             })
-    });
+        })
+    }
 
+    
+    var rejectOpenAccount = function (data) {
+        return new Promise(function (resolve,reject) {
+            $.ajax({
+                data:data,
+                url:"/member/rejectOpenAccount",
+                success:function (res) {
+                    if(res.success){
+                        resolve(res)
+                    }else{
+                        reject(res)
+                    }
+                },error:reject
+            })
+        })
+    }
+    
+    
     var getMemberList = function (data) {
         return new Promise(function (resolve,reject) {
             $.ajax({
@@ -47,6 +60,7 @@ define(["Promise","jquery","service/member-session"],function (Promise,$,memberS
 
     return {
         getFrontMember:getFrontMember,
-        getMemberList:getMemberList
+        getMemberList:getMemberList,
+        rejectOpenAccount:rejectOpenAccount
     };
 })

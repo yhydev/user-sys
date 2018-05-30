@@ -1,10 +1,12 @@
 require(["jquery","service/member","jquery-validator","jquery-form","jquery-cookie"],function ($,memberService) {
 
-    memberService.getFrontMember.then(function (res) {
+    memberService.getFrontMember().then(function (res) {
         if(res.data.type == "manager"){
             location.href = "/manager_index.html"
         }
     }).catch(function (reason) {
+        alert(reason.message)
+        location.href = "/manager_login.html";
     })
 
 

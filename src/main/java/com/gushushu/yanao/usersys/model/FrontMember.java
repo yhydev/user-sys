@@ -8,38 +8,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 public class FrontMember {
 
-    private Boolean openAccount;
-    private Boolean applyForOpenAccount;
     private String innerDiscAccount;
     private String account;
     private String type;
+    private String openAccountStatus;
 
 
-    public FrontMember(Boolean openAccount, Boolean applyForOpenAccount, String innerDiscAccount,String account,String type) {
-        this.openAccount = openAccount;
-        this.applyForOpenAccount = applyForOpenAccount;
+    public FrontMember(String openAccount, String innerDiscAccount,String account,String type) {
+        this.openAccountStatus = openAccount;
         this.innerDiscAccount = innerDiscAccount;
         this.account = account;
         this.type = type;
     }
 
-    @Override
-    public String toString() {
-        return "FrontMember{" +
-                "openAccount=" + openAccount +
-                ", applyForOpenAccount=" + applyForOpenAccount +
-                ", innerDiscAccount='" + innerDiscAccount + '\'' +
-                ", account='" + account + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+    public String getInnerDiscAccount() {
+        return innerDiscAccount;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setInnerDiscAccount(String innerDiscAccount) {
+        this.innerDiscAccount = innerDiscAccount;
     }
 
     public String getAccount() {
@@ -50,27 +37,19 @@ public class FrontMember {
         this.account = account;
     }
 
-    public Boolean getOpenAccount() {
-        return openAccount;
+    public String getType() {
+        return type;
     }
 
-    public void setOpenAccount(Boolean openAccount) {
-        this.openAccount = openAccount;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Boolean getApplyForOpenAccount() {
-        return applyForOpenAccount;
+    public String getOpenAccountStatus() {
+        return openAccountStatus;
     }
 
-    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
-        this.applyForOpenAccount = applyForOpenAccount;
-    }
-
-    public String getInnerDiscAccount() {
-        return innerDiscAccount;
-    }
-
-    public void setInnerDiscAccount(String innerDiscAccount) {
-        this.innerDiscAccount = innerDiscAccount;
+    public void setOpenAccountStatus(String openAccountStatus) {
+        this.openAccountStatus = openAccountStatus;
     }
 }

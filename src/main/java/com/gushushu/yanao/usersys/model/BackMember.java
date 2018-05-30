@@ -12,8 +12,7 @@ public class BackMember {
     @JsonSerialize(using = DateSerialize.class)
     private Date createDate;// 创建日期
 
-    private Boolean applyForOpenAccount;//是否申请开户
-    private Boolean openAccount;//是否已经开户
+    private String openAccountStatus;//是否已经开户
 
     private String name; //姓名
     private String idCard; //身份证
@@ -53,20 +52,12 @@ public class BackMember {
         this.createDate = createDate;
     }
 
-    public Boolean getApplyForOpenAccount() {
-        return applyForOpenAccount;
+    public String getOpenAccountStatus() {
+        return openAccountStatus;
     }
 
-    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
-        this.applyForOpenAccount = applyForOpenAccount;
-    }
-
-    public Boolean getOpenAccount() {
-        return openAccount;
-    }
-
-    public void setOpenAccount(Boolean openAccount) {
-        this.openAccount = openAccount;
+    public void setOpenAccountStatus(String openAccountStatus) {
+        this.openAccountStatus = openAccountStatus;
     }
 
     public String getName() {
@@ -139,5 +130,24 @@ public class BackMember {
 
     public void setSetInnerDiscDate(Date setInnerDiscDate) {
         this.setInnerDiscDate = setInnerDiscDate;
+    }
+
+    @Override
+    public String toString() {
+        return "BackMember{" +
+                "memberId='" + memberId + '\'' +
+                ", account='" + account + '\'' +
+                ", createDate=" + createDate +
+                ", openAccountStatus='" + openAccountStatus + '\'' +
+                ", name='" + name + '\'' +
+                ", idCard='" + idCard + '\'' +
+                ", idCardFrontUrl='" + idCardFrontUrl + '\'' +
+                ", idCardBehindUrl='" + idCardBehindUrl + '\'' +
+                ", bankCard='" + bankCard + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", applyForOpenAccountDate=" + applyForOpenAccountDate +
+                ", innerDiscAccount='" + innerDiscAccount + '\'' +
+                ", setInnerDiscDate=" + setInnerDiscDate +
+                '}';
     }
 }

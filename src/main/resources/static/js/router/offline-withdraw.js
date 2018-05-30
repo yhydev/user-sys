@@ -41,7 +41,7 @@ define(["vue","jquery","component/widget","component/router","jquery-form","vali
 
 
     var ret = {
-        props:["profile","token"],
+        props:["profile","token","openAccountStatus"],
         template:"#offline-withdraw-template",
         mixins:[widgetComponent],
         mounted:function () {

@@ -109,7 +109,7 @@
     <div class="row clearfix">
         <div class="router-view">
             <div class="col-md-12 column">
-                <router-view :profile="profile" :token="token"></router-view>
+                <router-view :profile="profile" :token="token" :open-account-status="openAccountStatus"></router-view>
             </div>
         </div>
     </div>
@@ -211,77 +211,14 @@
 </script>
 <!--transaction list template-->
 
-<!--offline deposit-template-->
-<script type="text/x-template" id="offline-deposit-template">
-
-    <user-template>
-
-        <div slot="title">
-            <h3>线下内盘入金<small class="description">&nbsp;&nbsp;入金前，请确认您已转账</small></h3>
-        </div>
-
-            <div slot="content">
-
-                <div v-if="profile.openAccount == false"  >
-                    <no-open-account-template></no-open-account-template>
-                </div>
-
-                <div v-if="profile.openAccount == true" class="col-md-4 col-md-offset-4">
-                    <modal-template :message="message">
-                    </modal-template>
-                    <form role="form" id="offlinePay-form" action="/transaction/offlinePay">
-                        <div class="form-group">
-                            <label>收款银行</label>
-
-                            <label v-bind:for="'_bank_'+index" v-for="(bank,index) in banks"
-                                   v-bind:class="{active:bank.choice}" class="bank-box" v-on:click="choice(index)">
-                                <input style="display: none" v-bind:value="bank.receiveAccountId" type="radio" name="receiveAccountId" v-bind:id="'_bank_'+index">
-                                <div>
-                                    <strong>{{bank.username}}</strong>
-                                    <small>{{bank.bankNo}}</small>
-                                </div>
-                                <div>
-                                    <strong>{{bank.bankName}}</strong>
-                                </div>
-                            </label>
-
-                            <label id="receiveAccountId-error" class="error" for="receiveAccountId"></label>
-
-
-                        </div>
-
-                        <div class="form-group">
-                            <label>入金金额(元)</label><input name="money" type="text" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>转账银行卡号</label><input name="payAccount" type="text" class="form-control" />
-                            <input name="token" type="hidden" v-model="token">
-                        </div>
-
-
-                        <button type="submit" class="btn btn-default">提交</button>
-                    </form>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-    </user-template>
-</script>
-<!--offline deposit-template end-->
 
 <!--offline withdraw-->
 <script type="text/x-template" id="offline-withdraw-template">
     <user-template>
         <h3 slot="title">线下内盘出金</h3>
         <div slot="content">
-            <no-open-account-template v-if="profile.openAccount == false"></no-open-account-template>
-            <div v-if="profile.openAccount == true" class="col-md-4 col-md-offset-4">
+            <no-open-account-template v-if="profile.openAccountStatus != openAccountStatus.openAccount"></no-open-account-template>
+            <div v-if="profile.openAccountStatus == openAccountStatus.openAccount" class="col-md-4 col-md-offset-4">
                 <modal-template :message="message">
                 </modal-template>
             <form id="offlineWithdraw-form" action="/transaction/offlineWithdraw">
@@ -300,55 +237,6 @@
 <!--open account template-->
 <script type="text/x-template" id="open-account-template">
 
-            <user-template>
-                <h2 slot="title">内盘期货开户</h2>
-                <div slot="content">
-
-                    <div v-if="profile.applyForOpenAccount == true" style="margin: 100px">
-                        <div v-if="profile.openAccount == true" style="text-align: center;padding:50px" >
-                            <p>您的期货账号为：{{profile.innerDiscAccount}}</p>
-                        </div>
-
-                        <div v-if="profile.openAccount == false" style="text-align: center;padding:50px" >
-                            <p>您的申请已提交，我们会在1-2 个工作日为您开户，请注意您的手机电话，短信通知。</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 col-md-offset-4">
-
-                        <form  v-if="profile.applyForOpenAccount == false"  role="form" action="/member/openAccount" id="openAccount-form">
-
-                            <div class="form-group">
-                                <label >姓名</label><input type="text" name="name" class="form-control" />
-                                <input type="hidden" v-model="token" name="token"/>
-                            </div>
-
-                            <div class="form-group">
-                                <label >身份证</label><input type="text" name="idCard" class="form-control"  />
-                            </div>
-                            <div class="form-group">
-                                <label >银行卡号</label><input type="text" name="bankCard" class="form-control"  />
-                            </div>
-                            <div class="form-group">
-                                <label >银行卡预留手机号</label><input name="phoneNumber" type="text" class="form-control"  />
-                            </div>
-                            <div class="form-group">
-                                <label >身份证正面照</label>
-                                <upload-component input-name="idCardBehindUrl"></upload-component>
-                            </div>
-                            <div class="form-group">
-                                <label >身份证背面照</label>
-                                <upload-component input-name="idCardFrontUrl"></upload-component>
-                            </div>
-
-
-                            <br>
-                            <button class="btn btn-default">提交</button>
-                        </form>
-
-                    </div>
-                </div>
-            </user-template>
 
     </script>
 <!--open account template end -->

@@ -2,27 +2,52 @@ define(["jquery","service/member-session","Promise"],function ($,memberSessionSe
 
     function nop() {}
 
-    function list(data) {
-
-        var promise = new Promise(function (resole,reject) {
+    
+    function update(data) {
+        return new Promise(function (resole,reject) {
             memberSessionService.memberSession.then(function (value) {
                 data.token = value.data.token;
                 $.ajax({
-                    success:resole,
+                    type:"put",
+                    success:function (res) {
+                        if(res.success){
+                            resole(res)
+                        }else{
+                            reject(res)
+                        }
+                    },
                     error:reject,
                     data:$.param(data),
-                    url:"/transaction/list"
+                    url:"/transaction"
                 })
             })
         });
+    }
+    
+    
+    function list(data) {
 
-
-
-        return promise;
-
+        return new Promise(function (resole,reject) {
+            memberSessionService.memberSession.then(function (value) {
+                data.token = value.data.token;
+                $.ajax({
+                    success:function (res) {
+                        if(res.success){
+                            resole(res)
+                        }else{
+                            reject(res)
+                        }
+                    },
+                    error:reject,
+                    data:$.param(data),
+                    url:"/transaction"
+                })
+            })
+        });
     }
 
     return {
-        list:list
+        list:list,
+        update:update
     };
 })

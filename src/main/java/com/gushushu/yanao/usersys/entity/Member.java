@@ -21,8 +21,7 @@ public class Member {
     private String email;//邮箱
 
 
-    private Boolean applyForOpenAccount;//是否申请开户
-    private Boolean openAccount;//是否已经开户
+    private String openAccountStatus;//开户状态
 
     private String name; //姓名
     private String idCard; //身份证
@@ -53,8 +52,7 @@ public class Member {
                 ", status='" + status + '\'' +
                 ", balance=" + balance +
                 ", email='" + email + '\'' +
-                ", applyForOpenAccount=" + applyForOpenAccount +
-                ", openAccount=" + openAccount +
+                ", openAccountStatus=" + openAccountStatus +
                 ", name='" + name + '\'' +
                 ", idCard='" + idCard + '\'' +
                 ", idCardFrontUrl='" + idCardFrontUrl + '\'' +
@@ -65,6 +63,14 @@ public class Member {
                 ", innerDiscAccount='" + innerDiscAccount + '\'' +
                 ", setInnerDiscDate=" + setInnerDiscDate +
                 '}';
+    }
+
+    public String getOpenAccountStatus() {
+        return openAccountStatus;
+    }
+
+    public void setOpenAccountStatus(String openAccountStatus) {
+        this.openAccountStatus = openAccountStatus;
     }
 
     public String getMemberId() {
@@ -129,22 +135,6 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Boolean getApplyForOpenAccount() {
-        return applyForOpenAccount;
-    }
-
-    public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
-        this.applyForOpenAccount = applyForOpenAccount;
-    }
-
-    public Boolean getOpenAccount() {
-        return openAccount;
-    }
-
-    public void setOpenAccount(Boolean openAccount) {
-        this.openAccount = openAccount;
     }
 
     public String getName() {

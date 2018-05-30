@@ -3,14 +3,18 @@ package com.gushushu.yanao.usersys.service;
 import com.gushushu.yanao.usersys.common.PageParam;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.SecretEncode;
+import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.entity.QMember;
 import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.model.FrontMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import com.gushushu.yanao.usersys.model.QueryData;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.QBean;
 import javafx.beans.binding.BooleanExpression;
+import org.hibernate.sql.Update;
 import org.hibernate.validator.constraints.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface MemberService {
 
@@ -42,6 +48,46 @@ public interface MemberService {
 
 
 
+    ResponseEntity<ResponseBody<String>> update(UpdateOneParam updateOneParam);
+
+
+    public static class UpdateOneParam{
+
+        private List<Predicate> where = new ArrayList();
+        private String openAccountStatus;
+        private String eqMemberId;
+        private String eqOpenAccountStatus;
+
+        public UpdateOneParam(String memberId){
+            where.add(QMember.member.memberId.eq(memberId));
+            this.eqMemberId = memberId;
+        }
+
+        public void eqOpenAccount(String openAccount){
+            where.add(QMember.member.openAccountStatus.eq(openAccount));
+            this.eqOpenAccountStatus = openAccount;
+        }
+
+        public void setOpenAccountStatus(String openAccountStatus) {
+            this.openAccountStatus = openAccountStatus;
+        }
+
+        public List<Predicate> getWhere() {
+            return where;
+        }
+
+        public String getOpenAccountStatus() {
+            return openAccountStatus;
+        }
+
+        public String getEqMemberId() {
+            return eqMemberId;
+        }
+
+        public String getEqOpenAccountStatus() {
+            return eqOpenAccountStatus;
+        }
+    }
 
 
     public static class SetInnerDiscAccountParam{
@@ -175,9 +221,16 @@ public interface MemberService {
     }
 
     public static class SearchParam<ResultBean> extends PageParam {
-        private Boolean applyForOpenAccount;
-        private Boolean openAccount;
+        private String openAccountStatus;
         private QBean<ResultBean> resultBean;
+
+        @Override
+        public String toString() {
+            return "SearchParam{" +
+                    ", openAccountStatus='" + openAccountStatus + '\'' +
+                    ", resultBean=" + resultBean +
+                    "} " + super.toString();
+        }
 
         public QBean<ResultBean> getResultBean() {
             return resultBean;
@@ -187,21 +240,14 @@ public interface MemberService {
             this.resultBean = resultBean;
         }
 
-        public Boolean getOpenAccount() {
-            return openAccount;
+        public String getOpenAccountStatus() {
+            return openAccountStatus;
         }
 
-        public void setOpenAccount(Boolean openAccount) {
-            this.openAccount = openAccount;
+        public void setOpenAccountStatus(String openAccountStatus) {
+            this.openAccountStatus = openAccountStatus;
         }
 
-        public Boolean getApplyForOpenAccount() {
-            return applyForOpenAccount;
-        }
-
-        public void setApplyForOpenAccount(Boolean applyForOpenAccount) {
-            this.applyForOpenAccount = applyForOpenAccount;
-        }
     }
 
     public static class CreateParam extends LoginParam{

@@ -45,12 +45,72 @@ define(["vue","jquery","component/widget","service/receive-account","component/u
     
     return {
         mixins:[widgetComponent],
-        template:"#offline-deposit-template",
+        template:`
+        
+    <user-template>
+
+        <div slot="title">
+            <h3>线下内盘入金<small class="description">&nbsp;&nbsp;入金前，请确认您已转账</small></h3>
+        </div>
+
+            <div slot="content">
+
+                <div v-if="profile.openAccountStatus != openAccountStatus.openAccount"  >
+                    <no-open-account-template></no-open-account-template>
+                </div>
+
+                <div v-if="profile.openAccountStatus == openAccountStatus.openAccount" class="col-md-4 col-md-offset-4">
+                    <modal-template :message="message">
+                    </modal-template>
+                    <form role="form" id="offlinePay-form" action="/transaction/offlinePay">
+                        <div class="form-group">
+                            <label>收款银行</label>
+
+                            <label v-bind:for="'_bank_'+index" v-for="(bank,index) in banks"
+                                   v-bind:class="{active:bank.choice}" class="bank-box" v-on:click="choice(index)">
+                                <input style="display: none" v-bind:value="bank.receiveAccountId" type="radio" name="receiveAccountId" v-bind:id="'_bank_'+index">
+                                <div>
+                                    <strong>{{bank.username}}</strong>
+                                    <small>{{bank.bankNo}}</small>
+                                </div>
+                                <div>
+                                    <strong>{{bank.bankName}}</strong>
+                                </div>
+                            </label>
+
+                            <label id="receiveAccountId-error" class="error" for="receiveAccountId"></label>
+
+
+                        </div>
+
+                        <div class="form-group">
+                            <label>入金金额(元)</label><input name="money" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>转账银行卡号</label><input name="payAccount" type="text" class="form-control" />
+                            <input name="token" type="hidden" v-model="token">
+                        </div>
+
+
+                        <button type="submit" class="btn btn-default">提交</button>
+                    </form>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </user-template>
+        `,
         data:function () {
             return {
                 banks:[],
                 activeIndex:null
-            }},props:["token","profile"],
+            }},props:["token","profile","openAccountStatus"],
         methods:{
             choice:function (index) {
                 if(this.activeIndex != null){

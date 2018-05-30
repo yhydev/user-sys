@@ -18,6 +18,7 @@ public class BackTransaction {
     private String detailId;
     private String account;
     private String transactionId;
+    private String memberId;
 
     @Override
     public String toString() {
@@ -31,7 +32,16 @@ public class BackTransaction {
                 ", detailId='" + detailId + '\'' +
                 ", account='" + account + '\'' +
                 ", transactionId='" + transactionId + '\'' +
+                ", memberId='" + memberId + '\'' +
                 '}';
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
     }
 
     public String getStatus() {

@@ -5,6 +5,7 @@ import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.entity.QMember;
 import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.model.FrontMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
@@ -19,6 +20,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,9 +28,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,13 +45,21 @@ public class MemberServiceImpl implements MemberService {
     public final static String USER_TYPE = "user";
     public final static String MANAGER_TYPE = "manager";
 
+
+    public  static class OpenAccountStatus{
+        public static String APPLY_FOR = "apply_for";
+        public static String NOT_APPLY_FOR = "not_apply_for";
+        public static String OPEN_ACCOUNT = "open_account";
+        public static String REJECT = "reject";
+
+    }
+
     public static QBean<BackMember> BACK_MEMBER_QBEAN = Projections.bean(
             BackMember.class,
             member.memberId,
             member.account,//账户 (手机号)
             member.createDate,// 创建日期
-            member.applyForOpenAccount,//是否申请开户
-            member.openAccount,//是否已经开户
+            member.openAccountStatus,//是否已经开户
             member.name, //姓名
             member.idCard, //身份证
             member.idCardFrontUrl, //身份证正面
@@ -110,14 +122,12 @@ public class MemberServiceImpl implements MemberService {
 
         if(member == null){
             errmsg = "未知 member";
-        }else if(!member.getApplyForOpenAccount()){
+        }else if(!OpenAccountStatus.APPLY_FOR.equals(member.getOpenAccountStatus())){
             errmsg = "用户未实名";
-        }else if(member.getOpenAccount()){
-            errmsg = "用户已开户";
-        } else{
+        }else{
             member.setApplyForOpenAccountDate(new Date());
             member.setInnerDiscAccount(setInnerDiscAccountParam.getInnerDiscAccount());
-            member.setOpenAccount(true);
+            member.setOpenAccountStatus(OpenAccountStatus.OPEN_ACCOUNT);
             memberRepository.save(member);
             response = ResponseEntityBuilder.success(member.getMemberId());
 
@@ -151,8 +161,7 @@ public class MemberServiceImpl implements MemberService {
             member.setPassword(createParam.getPassword());
             member.setAccount(createParam.getAccount());
             member.setBalance(0L);
-            member.setOpenAccount(false);
-            member.setApplyForOpenAccount(false);
+            member.setOpenAccountStatus(OpenAccountStatus.NOT_APPLY_FOR);
             member.setType(createParam.getType());
             memberRepository.save(member);
 
@@ -197,16 +206,10 @@ public class MemberServiceImpl implements MemberService {
 
         List<Predicate> predicates  = new ArrayList<>();
 
-        if(searchParam.getApplyForOpenAccount() != null){
-            Predicate predicate = member.applyForOpenAccount.eq(searchParam.getApplyForOpenAccount());
+        if(!StringUtils.isEmpty(searchParam.getOpenAccountStatus())){
+            Predicate predicate = member.openAccountStatus.eq(searchParam.getOpenAccountStatus());
             predicates.add(predicate);
         }
-
-        if(searchParam.getOpenAccount() != null){
-            Predicate predicate = member.openAccount.eq(searchParam.getOpenAccount());
-            predicates.add(predicate);
-        }
-
 
         return predicates;
     }
@@ -251,10 +254,11 @@ public class MemberServiceImpl implements MemberService {
         if(rep.getBody().isSuccess()){
 
             Member member = rep.getBody().getData();
-            if(member.getApplyForOpenAccount()!=null && member.getApplyForOpenAccount()){
+            if(OpenAccountStatus.OPEN_ACCOUNT.equals(member.getOpenAccountStatus())){
                 errmsg = "您已经申请开户";
             }else{
-                Long idCardCount = memberRepository.countByIdCard(applyForAccountParam.getIdCard());
+                Long idCardCount = memberRepository.countByIdCardAndStatus(applyForAccountParam.getIdCard(),OpenAccountStatus.APPLY_FOR);
+                idCardCount += memberRepository.countByIdCardAndStatus(applyForAccountParam.getIdCard(),OpenAccountStatus.OPEN_ACCOUNT);
 
                 //判断此身份证是否开户
                 if(idCardCount > 0){
@@ -268,7 +272,7 @@ public class MemberServiceImpl implements MemberService {
                     member.setIdCardFrontUrl(applyForAccountParam.getIdCardFrontUrl());
                     member.setPhoneNumber(applyForAccountParam.getPhoneNumber());
                     member.setApplyForOpenAccountDate(new Date());
-                    member.setApplyForOpenAccount(true);
+                    member.setOpenAccountStatus(OpenAccountStatus.APPLY_FOR);
 
                     memberRepository.save(member);
 
@@ -285,6 +289,45 @@ public class MemberServiceImpl implements MemberService {
         }
 
         logger.info("response = " + response);
+
+        return response;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<ResponseBody<String>> update(UpdateOneParam updateOneParam) {
+
+        System.out.println("updateOneParam = [" + updateOneParam + "]");
+
+        JPAUpdateClause jpaUpdateClause = jpaQueryFactory.update(QMember.member);
+        ResponseEntity<ResponseBody<String>> response = null;
+        String errmsg = null;
+
+        if(!StringUtils.isEmpty(updateOneParam.getOpenAccountStatus())){
+            jpaUpdateClause.set(QMember.member.openAccountStatus,updateOneParam.getOpenAccountStatus());
+        }
+
+        if(jpaUpdateClause.isEmpty()){
+            errmsg = "无效的更新数据";
+        }else{
+            Predicate[] predicates = new Predicate[updateOneParam.getWhere().size()];
+            updateOneParam.getWhere().toArray(predicates);
+            jpaUpdateClause.where(predicates);
+            Long upCount = jpaUpdateClause.execute();
+            if(upCount != 1){
+                //TODO 事务回滚
+                errmsg = "无效的更新 update count " + upCount;
+            }else{
+                response = ResponseEntityBuilder.success(updateOneParam.getEqMemberId());
+            }
+        }
+
+
+        if(errmsg != null){
+            response = ResponseEntityBuilder.failed(errmsg);
+        }
+
+        System.out.println("response = " + response);
 
         return response;
     }

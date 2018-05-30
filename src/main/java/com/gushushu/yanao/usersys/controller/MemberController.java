@@ -74,6 +74,16 @@ public class MemberController {
         return  memberService.getFrontMember(token);
     }
 
+    //TODO 管理员权限
+    @RequestMapping("/rejectOpenAccount")
+    public ResponseEntity updateMember(String memberId){
+        MemberService.UpdateOneParam updateOneParam = new  MemberService.UpdateOneParam(memberId);
+        //用户必须是没有开户
+        updateOneParam.setOpenAccountStatus(MemberServiceImpl.OpenAccountStatus.REJECT);
+        updateOneParam.eqOpenAccount(MemberServiceImpl.OpenAccountStatus.APPLY_FOR);
+
+        return memberService.update(updateOneParam);
+    }
 
 
     //TODO 管理员权限

@@ -74,6 +74,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.answer,
             transaction.detailId,
             transaction.member.account,
+            transaction.member.memberId,
             transaction.transactionId
     );
 
@@ -140,7 +141,7 @@ public class TransactionServiceImpl implements TransactionService {
                 //用户是否存在
                 if(!findMemberResponse.getBody().isSuccess()){
                     errmsg = findMemberResponse.getBody().getMessage();
-                }else if(!member.getOpenAccount()){//是否开通交易账户
+                }else if(!MemberServiceImpl.OpenAccountStatus.OPEN_ACCOUNT.equals(member.getOpenAccountStatus())){//是否开通交易账户
                     errmsg = "您还未开通交易账户，暂不能交易";
                 }else{
 
@@ -193,7 +194,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Member member = findMemberResponse.getBody().getData();
             //判断用户是否开户
-            if(member.getOpenAccount()){
+            if(MemberServiceImpl.OpenAccountStatus.OPEN_ACCOUNT.equals(member.getOpenAccountStatus())){
 
                 Transaction transaction = generate(member.getMemberId(),OFFLINE_WITHDRAW_TYPE,offlineWithdrawParam.getMoney());
                 transactionRepository.save(transaction);

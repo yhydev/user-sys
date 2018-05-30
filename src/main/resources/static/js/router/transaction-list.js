@@ -1,7 +1,5 @@
 define(["vue","jquery","service/transaction","component/router","jquery-form","validator-utils","filter/app-dict"],function (Vue,$,transactionService) {
 
-    
-
     return {
         /*props:["profile"],*/
         template:"#transaction-list-template",

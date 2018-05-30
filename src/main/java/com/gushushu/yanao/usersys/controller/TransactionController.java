@@ -1,13 +1,15 @@
 package com.gushushu.yanao.usersys.controller;
 
-import com.gushushu.yanao.usersys.entity.MemberSession;
-import com.gushushu.yanao.usersys.service.MemberService;
+import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.TransactionService;
+import com.gushushu.yanao.usersys.service.impl.MemberServiceImpl;
 import com.gushushu.yanao.usersys.service.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,19 +36,42 @@ public class TransactionController {
     }
 
 
-    @RequestMapping(path = "/list",params = {"token"})
+    /**
+     * 查询交易列表
+     * @param searchParam
+     * @param token
+     * @return
+     */
+    @RequestMapping
     public ResponseEntity transactionList(TransactionService.SearchParam searchParam,String token){
 
-        String memberId = memberSessionService.findMemberId(token).getBody().getData();
-        searchParam.setMemberId(memberId);
-        return transactionService.search(searchParam, TransactionServiceImpl.FRONT_TRANSACTION_Q_BEAN);
+        ResponseEntity response = null;
+
+         ResponseBody<Member> findMemberresponse = memberSessionService.findMember(token).getBody();
+         if(findMemberresponse.isSuccess()){
+             if(findMemberresponse.getData().getType().equals(MemberServiceImpl.USER_TYPE)){
+                 //用户查询交易
+                 searchParam.setMemberId(findMemberresponse.getData().getMemberId());
+                 response = transactionService.search(searchParam,TransactionServiceImpl.FRONT_TRANSACTION_Q_BEAN);
+             }else if(findMemberresponse.getData().getType().equals(MemberServiceImpl.MANAGER_TYPE)){
+                 //管理员查询交易
+                 response = transactionService.search(searchParam,TransactionServiceImpl.BACK_TRANSACTION_Q_BEAN);
+             }
+         }
+
+        return response;
     }
 
-    @RequestMapping(path = "/list",params = {"managerToken"})
-    public ResponseEntity transactionList(TransactionService.SearchParam searchParam){
-        return transactionService.search(searchParam,TransactionServiceImpl.BACK_TRANSACTION_Q_BEAN);
-    }
 
+
+    /**
+     * 更新交易
+     * @return
+     */
+    @PutMapping//TODO 管理员权限
+    public ResponseEntity update(TransactionService.UpdateParam updateParam){
+        return transactionService.update(updateParam);
+    }
 
 
     /*@RequestMapping("/member")

@@ -13,6 +13,22 @@ require(["vue"],function (Vue) {
         return dict[k];
     })
 
+    Vue.filter("not_apply_for",function (value) {
+        return value == "not_apply_for";
+    })
+
+    Vue.filter("apply_for",function (value) {
+        return value == "apply_for";
+    })
+
+    Vue.filter("open_account",function (open_account) {
+        return value == "open_account";
+    })
+
+    Vue.filter("reject",function (value) {
+        return value == "reject";
+    })
+
 
     Vue.filter("default",function (k,def) {
         return k?k:def;

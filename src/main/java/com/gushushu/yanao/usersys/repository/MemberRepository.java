@@ -18,13 +18,13 @@ public interface MemberRepository extends JpaRepository<Member,String> {
 
     Long countByType(String type);
 
-    Long countByIdCard(String idCard);
+    Long countByIdCardAndStatus(String idCard,String openAccountStatus);
 
     Member findByMemberId(String memberId);
 
     Member findByAccount(String account);
 
-    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccount,t.applyForOpenAccount, t.innerDiscAccount,t.account,t.type) from Member t where t.memberId = :id")
+    @Query("select new com.gushushu.yanao.usersys.model.FrontMember(t.openAccountStatus, t.innerDiscAccount,t.account,t.type) from Member t where t.memberId = :id")
     FrontMember findFront(@Param("id") String id);
 
     @Query("select t.account from Member t where  t.memberId = :memberId")

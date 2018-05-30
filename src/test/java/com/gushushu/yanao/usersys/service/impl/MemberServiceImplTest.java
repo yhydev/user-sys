@@ -1,4 +1,3 @@
-/*
 package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.Application;
@@ -11,6 +10,7 @@ import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
+import com.gushushu.yanao.usersys.service.TransactionService;
 import org.apache.catalina.User;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -50,8 +50,9 @@ public class MemberServiceImplTest {
     String password = "888888";
     String accountId = null;
     String token = null;
+    String memberId = null;
 
-//    @Before
+    @Before
     public void initialize(){
 
         MemberService.LoginParam loginParam = new MemberService.LoginParam();
@@ -65,6 +66,7 @@ public class MemberServiceImplTest {
 
         accountId = memberSessionResponse.getBody().getData().getAccount();
         token = memberSessionResponse.getBody().getData().getToken();
+        memberId = memberSessionResponse.getBody().getData().getMemberId();
 
     }
 
@@ -79,57 +81,6 @@ public class MemberServiceImplTest {
     }
 
 
-    @Test
-    public void register() {
-
-        System.out.println("**********\tregister(Not have phone code)\t**********");
-
-        MemberService.RegisterParam registerParam = new MemberService.RegisterParam();
-
-        //错误验证码注册
-        registerParam.setAccount(account);
-        registerParam.setPassword(password);
-        registerParam.setPhoneCode("416645");
-        memberService.register(registerParam);
-
-        System.out.println("**********\tregister(have phone code)\t**********");
-
-        //正确验证码注册
-        IdentifyingCodeService.SendParam sendParam = new IdentifyingCodeService.SendParam();
-        sendParam.type = MemberService.VCODE_TYPE_REGISTER;
-        sendParam.phone = account;
-        ResponseEntity<ResponseBody<String>> rep =  identifyingCodeService.send(sendParam);
-
-        //get send sms code for before
-        IdentifyingCode code = identifyingCodeRepository.findByIdentifyingCodeId(rep.getBody().getData());
-
-        registerParam.setPhoneCode(code.getCode());
-        memberService.register(registerParam);
-
-    }
-
-    @Test
-    public void login() {
-
-        MemberService.LoginParam loginParam = new MemberService.LoginParam();
-        loginParam.setAccount(account);
-        loginParam.setPassword(password);
-        memberService.login(loginParam);
-
-    }
-
-
-    @Test
-    public void find(){
-
-//        register();
-
-        MemberService.SearchParam searchParam = new MemberService.SearchParam();
-        searchParam.setResultBean(MemberServiceImpl.backMemberQBean);
-        searchParam.setApplyForOpenAccount(true);
-        memberService.search(searchParam);
-
-    }
 
     @Test
     public void realName(){
@@ -173,20 +124,23 @@ public class MemberServiceImplTest {
     }
 
 
+
     @Test
-    public void setInnerDiscAccount(){
+    public void update(){
+   /*     MemberService.UpdateOneParam updateParam = new MemberService.UpdateOneParam();
+        memberService.update(updateParam);
 
 
-        System.out.println("**********\tsetInnerDiscAccount\t*********");
+        updateParam.setMemberId(memberId);
+        memberService.update(updateParam);
 
-        MemberService.SetInnerDiscAccountParam setInnerDiscAccountParam = new MemberService.SetInnerDiscAccountParam();
+        updateParam.setOpenAccount(false);
+        memberService.update(updateParam);
+*/
 
-        setInnerDiscAccountParam.setAccountId(accountId);
-        setInnerDiscAccountParam.setInnerDiscAccount("innerDiscAccount");
 
-        memberService.setInnerDiscAccount(setInnerDiscAccountParam);
 
     }
 
 
-}*/
+}

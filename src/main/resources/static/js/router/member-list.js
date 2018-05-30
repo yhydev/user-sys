@@ -2,7 +2,7 @@ define(["service/member","component/router"],function (memberService) {
     return {
         template:`
         <router-template>
-    <h3 slot="title">开户列表</h3>
+    <h3 slot="title">用户列表</h3>
     <div slot="content">
         <table  class="table table-striped table-hover">
             <thead>
@@ -13,15 +13,10 @@ define(["service/member","component/router"],function (memberService) {
                 <th>
                     开户信息
                 </th>
-
-                <th>
-                    身份证照片
-                </th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="item in data.results">
-            
             
                 <td>
                     <div>
@@ -32,25 +27,26 @@ define(["service/member","component/router"],function (memberService) {
                         <label>注册日期:&nbsp;</label><span>{{item.createDate}}</span>
                     </div>
                     
-                    <div v-if="item.applyForOpenAccount == true && item.openAccount == false">
-                    <!--    <label>内盘期货账户:&nbsp;</label><span>{{item.innerDiscAccount?item.innerDiscAccount:'暂未开通'}}</span>-->
-                    <label>开户:&nbsp;</label><span><router-link v-bind:to="'/setInnerDiscAccount?memberId='+item.memberId" >操作</router-link></span>  
+                    <div v-if="item.openAccountStatus == openAccountStatus.applyFor">
+                    <label>开户操作:&nbsp;</label>
+                    <span>
+                    <router-link v-bind:to="'/setInnerDiscAccount?memberId='+item.memberId" >开户</router-link>&nbsp;-&nbsp;<a href="javascript:void()" v-on:click="rejectOpenAccount(item.memberId)">拒绝</a></span>
+                    
                     </div>  
                     
-                    <div v-if="item.openAccount == true">
+                    <div v-if="item.openAccountStatus == openAccountStatus.openAccount">
                         <label>内盘期货账户:&nbsp;</label><span>{{item.innerDiscAccount}}</span>  
                     </div>  
 
                 </td>
                 
                 <td >
-                
-                    <div v-if="item.applyForOpenAccount == false">
-                    未申请开户
-</div>
-                    <div v-if="item.applyForOpenAccount == true">
+                    <div v-if="item.openAccountStatus == openAccountStatus.notApplyFor">
+                        未申请开户
+                    </div>
+                    <div v-if="item.openAccountStatus != openAccountStatus.notApplyFor">
                     
-                        <div>
+                    <div>
                             <label>姓名:&nbsp;</label><span>{{item.name}}</span>
                         </div>
                     <div>
@@ -65,20 +61,17 @@ define(["service/member","component/router"],function (memberService) {
                     <div>
                         <label>申请日期:&nbsp;</label><span>{{item.applyForOpenAccountDate}}</span>
                     </div>
-                    
-                    <div>
-                    </div>
-</div>
-                </td>
-                
-                <td>
-                    <div>
+                     <div>
                         <label>身份证正面照:&nbsp;</label><span><a target="_blank" v-bind:href="item.idCardFrontUrl">点击查看</a></span>
                     </div>
                     <div>
                         <label>身份证反面照:&nbsp;</label><span><a target="_blank" v-bind:href="item.idCardBehindUrl">点击查看</a></span>
+                    </div>     
+                    <div>
                     </div>
                 </td>
+                
+               
             </tr>
             </tbody>
         </table>
@@ -94,7 +87,7 @@ define(["service/member","component/router"],function (memberService) {
 
         
         `,
-        props:["token"],
+        props:["token","openAccountStatus"],
         data:function () {
             return {
                 data:{}
@@ -105,11 +98,26 @@ define(["service/member","component/router"],function (memberService) {
                 var param = JSON.stringify(this.$route.query)
                 param = JSON.parse(param)
                 param.token = this.token;
+
+                for(name in this.$route.params){
+                    param[name] = this.$route.params[name];
+                }
+
                 memberService.getMemberList(param).then(function (value) {
                     vue.data = value.data;
                 }).catch(function (reason) {
                     alert(reason.message)
                 })
+            },rejectOpenAccount:function (memberId) {
+                var isEnter = confirm("确定要拒绝此用户的开户申请吗？")
+                var vue = this;
+                if(isEnter){
+                    memberService.rejectOpenAccount({memberId:memberId}).then(function (value) {
+                        vue.$router.go(0)
+                    }).catch(function (reason) {
+                        alert(reason.message)
+                    })
+                }
             }
         },watch:{
 
