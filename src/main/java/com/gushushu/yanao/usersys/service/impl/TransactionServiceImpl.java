@@ -121,21 +121,21 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public ResponseEntity<ResponseBody<String>> offlinePay(OfflinePayParam offlinePayParam) {
+    public ResponseEntity<ResponseBody<String>> offlineDeposit(OfflineDepositParam offlineDepositParam) {
 
-        logger.info("offlinePayParam = [" + offlinePayParam + "]");
+        logger.info("offlineDepositParam = [" + offlineDepositParam + "]");
         ResponseEntity response = null;
         String errmsg = null;
 
-        ResponseEntity<ResponseBody<String>> bankCardResponse = validateService.bankCard(offlinePayParam.getPayAccount());
+        ResponseEntity<ResponseBody<String>> bankCardResponse = validateService.bankCard(offlineDepositParam.getPayAccount());
 
             //支付银行卡是否有效
             if(!bankCardResponse.getBody().isSuccess()){
                 errmsg = bankCardResponse.getBody().getMessage();
-            }else if(receiveAccountRepository.existsByBankNo(offlinePayParam.getPayAccount())) {// 支付银行卡是否存在于收款账户
+            }else if(receiveAccountRepository.existsByBankNo(offlineDepositParam.getPayAccount())) {// 支付银行卡是否存在于收款账户
                 errmsg = "转账银行卡为无效的卡号";
             }else{
-                ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlinePayParam.getToken());
+                ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlineDepositParam.getToken());
                 Member member = findMemberResponse.getBody().getData();
 
                 //用户是否存在
@@ -145,12 +145,12 @@ public class TransactionServiceImpl implements TransactionService {
                     errmsg = "您还未开通交易账户，暂不能交易";
                 }else{
 
-                    ReceiveAccount receiveAccount = receiveAccountRepository.findByReceiveAccountId(offlinePayParam.getReceiveAccountId());
+                    ReceiveAccount receiveAccount = receiveAccountRepository.findByReceiveAccountId(offlineDepositParam.getReceiveAccountId());
                     if(receiveAccount == null){
                         errmsg = "无效的收款人账户";
                     }else{
                         OfflinePay offlinePay = new OfflinePay();
-                        offlinePay.setPayAccount(offlinePayParam.getPayAccount());
+                        offlinePay.setPayAccount(offlineDepositParam.getPayAccount());
                         offlinePay.setReceiveBankName(receiveAccount.getBankName());
                         offlinePay.setReceiveBankNo(receiveAccount.getBankNo());
                         offlinePay.setReceiveUserName(receiveAccount.getUsername());
@@ -158,7 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
 
                         String memberId = member.getMemberId();
 
-                        Transaction transaction = generate(memberId,OFFLINE_PAY_TYPE,offlinePayParam.getMoney(),offlinePay.getOffLineId());
+                        Transaction transaction = generate(memberId,OFFLINE_PAY_TYPE,offlineDepositParam.getMoney(),offlinePay.getOffLineId());
 
                         transactionRepository.save(transaction);
                         response = ResponseEntityBuilder.success(transaction.getTransactionId());

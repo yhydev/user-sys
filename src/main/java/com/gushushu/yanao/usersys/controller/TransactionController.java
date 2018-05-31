@@ -25,9 +25,9 @@ public class TransactionController {
     private TransactionService transactionService;
 
 
-    @RequestMapping("/offlinePay")
-    public ResponseEntity offlinePay(@Validated TransactionService.OfflinePayParam offlinePayParam){
-        return transactionService.offlinePay(offlinePayParam);
+    @RequestMapping("/offlineDeposit")
+    public ResponseEntity offlinePay(@Validated TransactionService.OfflineDepositParam offlineDepositParam){
+        return transactionService.offlineDeposit(offlineDepositParam);
     }
 
     @RequestMapping("/offlineWithdraw")

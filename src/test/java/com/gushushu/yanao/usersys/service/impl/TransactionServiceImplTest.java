@@ -79,58 +79,6 @@ public class TransactionServiceImplTest implements AppConstant{
 
 
 
-    @Test
-    public void underLinePay(){
-
-        TransactionService.OfflinePayParam underLinePayParam = new TransactionService.OfflinePayParam();
-
-        underLinePayParam.setMoney(100L);
-        underLinePayParam.setToken(token);
-        underLinePayParam.setReceiveAccountId("6212261702013626387");
-        underLinePayParam.setPayAccount("6212261702013626387");
-        transactionService.offlinePay(underLinePayParam);
-
-
-
-
-
-    }
-
-
-
-    @Test
-    public void update(){
-
-
-        TransactionService.OfflinePayParam underLinePayParam = new TransactionService.OfflinePayParam();
-
-        underLinePayParam.setMoney(100L);
-        underLinePayParam.setToken(token);
-        //underLinePayParam.setReceiveAccount("6212261702013626387");
-        underLinePayParam.setPayAccount("62253652715628211");
-        ResponseEntity<ResponseBody<String>> offlinePayResponse =  transactionService.offlinePay(underLinePayParam);
-
-
-        assert offlinePayResponse.getBody().isSuccess();
-
-
-        TransactionService.UpdateParam updateParam = new TransactionService.UpdateParam();
-        updateParam.setRemark("哈哈哈");
-        updateParam.setSuccess(false);
-        updateParam.setTransactionId(offlinePayResponse.getBody().getData()+1);
-        transactionService.update(updateParam);
-
-
-        updateParam.setRemark("哈哈哈");
-        updateParam.setSuccess(false);
-        updateParam.setTransactionId(offlinePayResponse.getBody().getData());
-        transactionService.update(updateParam);
-
-        transactionService.update(updateParam);
-
-
-
-    }
 
 
     @Test

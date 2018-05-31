@@ -1,16 +1,17 @@
 require(["vue"],function (Vue) {
 
     var dict = {
-        offline_pay:"线下入金",
+        offline_deposit:"线下入金",
         offline_withdraw:"线下出金",
         failed:"交易失败",
         success:"交易成功",
         wait_check:"等待审核",
+        all:"全部"
 
     }
 
     Vue.filter("app_dict",function (k) {
-        return dict[k];
+        return dict[k]?dict[k]:k;
     })
 
     Vue.filter("not_apply_for",function (value) {

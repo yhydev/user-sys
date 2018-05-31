@@ -32,6 +32,16 @@
 }
 
 
+/*超链接选中*/
+a.active{
+    color: #aaa;
+}
+
+
+a{
+    margin:auto 4px ;
+}
+
 .router-view{
     padding: 16px;
 }

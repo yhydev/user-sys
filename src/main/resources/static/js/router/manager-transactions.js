@@ -6,6 +6,20 @@ define(["service/transaction","component/router","filter/app-dict"],function (tr
         <user-template>
         <h1 slot="title">交易列表</h1>
         <div slot="content">
+                <div class="row col-md-12" role="form">
+                    <div>
+                       <label>交易类型：</label>
+                       <a href="javascript:;" v-bind:class="{active:!$route.query.type}" v-on:click="query({'type':'all'})">全部</a>
+                       <a href="javascript:;" v-bind:class="{active:$route.query.type == v }" v-for="v in type" v-on:click="query({'type':v})">{{v|app_dict}}</a>
+                    </div>
+                    
+                    <div>
+                       <label>交易状态：</label>
+                       <a href="javascript:;" v-bind:class="{active:!$route.query.status}" v-on:click="query({'status':'all'})">全部</a>
+                                              <a href="javascript:;" v-bind:class="{active:$route.query.status == v }" v-for="v in status" v-on:click="query({'status':v})">{{v|app_dict}}</a>
+                    </div>
+                  
+                </div>
             <table  class="table table-striped table-hover">
                 <thead>
                 <tr>
@@ -31,7 +45,9 @@ define(["service/transaction","component/router","filter/app-dict"],function (tr
                         <div><label>交易金额(元)：</label><span>{{item.money}}</span></div>
                         <div><label>交易时间：</label><span>{{item.createDate}}</span></div>
                         <div><label>审核时间：</label><span>{{item.updateDate}}</span></div>
-
+                        <div><label>交易详情：</label><span>
+                        
+</span></div>
                         <div v-if="transactionStatus.wait_check == item.status">
                         <label>审核操作：</label><span>
                         
@@ -57,11 +73,29 @@ define(["service/transaction","component/router","filter/app-dict"],function (tr
         props:["token","transactionStatus"],
         data:function () {
             return {
-                data:{}
+                data:{},
+                status:["wait_check","success","failed"],
+                type:["offline_deposit","offline_withdraw"]
             }
         },methods:{
-            load:function () {
+            query:function (data) {
+                var query = this.$route.query;
+                for(name in query){
+                    if(!data[name] ){
+                        data[name] = query[name];
+                    }
 
+                    if(data[name]=='all'){
+                        data[name]=null;
+                    }
+                }
+                var query = JSON.parse(JSON.stringify(data))
+
+
+                this.$router.push({path:this.$route.path,query:query});
+
+            },
+            load:function () {
                 var vue = this;
                 var query = JSON.parse(JSON.stringify(this.$route.query))
                 transactionService.list(query).then(function (value) {
@@ -94,6 +128,7 @@ define(["service/transaction","component/router","filter/app-dict"],function (tr
             }
         },watch:{
             "$route":function () {
+                console.log(111)
                 this.load();
             }
         },mounted:function () {

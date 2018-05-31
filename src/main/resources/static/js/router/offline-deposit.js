@@ -62,7 +62,7 @@ define(["vue","jquery","component/widget","service/receive-account","component/u
                 <div v-if="profile.openAccountStatus == openAccountStatus.openAccount" class="col-md-4 col-md-offset-4">
                     <modal-template :message="message">
                     </modal-template>
-                    <form role="form" id="offlinePay-form" action="/transaction/offlinePay">
+                    <form role="form" id="offlinePay-form" action="/transaction/offlineDeposit">
                         <div class="form-group">
                             <label>收款银行</label>
 

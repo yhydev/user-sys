@@ -30,7 +30,7 @@ public interface TransactionService {
     static final String SUCCESS_STATUS = "success";
     static final String FAILED_STATUS = "failed";
 
-    static final String OFFLINE_PAY_TYPE = "offline_pay";
+    static final String OFFLINE_PAY_TYPE = "offline_deposit";
     static final String OFFLINE_WITHDRAW_TYPE = "offline_withdraw";
 
 
@@ -40,10 +40,10 @@ public interface TransactionService {
 
     /**
      * 线下支付
-     * @param offlinePayParam
+     * @param offlineDepositParam
      * @return
      */
-    ResponseEntity<ResponseBody<String>> offlinePay(OfflinePayParam offlinePayParam);
+    ResponseEntity<ResponseBody<String>> offlineDeposit(OfflineDepositParam offlineDepositParam);
 
 
     ResponseEntity<ResponseBody<String>> offlineWithdraw(OfflineWithdrawParam OfflineWithdrawParam);
@@ -182,7 +182,7 @@ public interface TransactionService {
         }
     }
 
-    public static class OfflinePayParam{
+    public static class OfflineDepositParam{
         @Range(message = "金额必须在 1 - 99999999 元之间",min = 1,max = 999999999)
         @NotNull(message = "金额不能为空")
         private Long money;//支付金额
