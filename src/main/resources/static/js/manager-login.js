@@ -4,9 +4,6 @@ require(["jquery","service/member","jquery-validator","jquery-form","jquery-cook
         if(res.data.type == "manager"){
             location.href = "/manager_index.html"
         }
-    }).catch(function (reason) {
-        alert(reason.message)
-        location.href = "/manager_login.html";
     })
 
 

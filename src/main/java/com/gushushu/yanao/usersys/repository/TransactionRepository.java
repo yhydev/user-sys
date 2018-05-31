@@ -23,6 +23,8 @@ public interface TransactionRepository extends JpaRepository<Transaction,String>
 
     Transaction findByTransactionId(String id);
 
+
+
 /*
     //@FieldResult()
    @Query("select new com.gushushu.yanao.usersys.model.FrontTransaction(t.status, t.type, t.money, t.createDate, t.updateDate, t.answer, t.detailId) from Transaction t")

@@ -39,7 +39,15 @@ public class TransactionServiceImplTest implements AppConstant{
     String token = null;
 
 
-    @Before
+    @Test
+    public void detail(){
+        transactionService.detail("4028098163b072e90163b07c0b330001");
+
+        transactionService.detail("4028098163b049e30163b059f9eb0000");
+    }
+
+
+//    @Before
     public void initialize(){
 
         MemberService.LoginParam loginParam = new MemberService.LoginParam();

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OfflinePayRepository extends JpaRepository<OfflinePay,String> {
 
+    OfflinePay findByOfflinePayId(String id);
 
 
 }

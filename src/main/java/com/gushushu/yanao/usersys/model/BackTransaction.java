@@ -16,9 +16,7 @@ public class BackTransaction {
     private Date updateDate;
     private String answer;
     private String detailId;
-    private String account;
     private String transactionId;
-    private String memberId;
 
     @Override
     public String toString() {
@@ -30,18 +28,8 @@ public class BackTransaction {
                 ", updateDate=" + updateDate +
                 ", answer='" + answer + '\'' +
                 ", detailId='" + detailId + '\'' +
-                ", account='" + account + '\'' +
                 ", transactionId='" + transactionId + '\'' +
-                ", memberId='" + memberId + '\'' +
                 '}';
-    }
-
-    public String getMemberId() {
-        return memberId;
-    }
-
-    public void setMemberId(String memberId) {
-        this.memberId = memberId;
     }
 
     public String getStatus() {
@@ -98,14 +86,6 @@ public class BackTransaction {
 
     public void setDetailId(String detailId) {
         this.detailId = detailId;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public String getTransactionId() {

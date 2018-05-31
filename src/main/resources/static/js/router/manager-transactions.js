@@ -1,6 +1,18 @@
-define(["service/transaction","component/router","filter/app-dict"],function (transactionService) {
+define(["service/transaction","component/router","filter/app-dict"],
+    function (transactionService) {
+
+ /*       Vue.use(VueRouter)
+    var routers = [
+
+    ];
+
+    var vueRouter = new VueRouter({
+        routes:routers
+    });*/
+
+
     return {
-        //template:`aaa`,
+   //     router:vueRouter,
         template:`
         
         <user-template>
@@ -22,31 +34,27 @@ define(["service/transaction","component/router","filter/app-dict"],function (tr
                 </div>
             <table  class="table table-striped table-hover">
                 <thead>
-                <tr>
+                <tr><!--
                     <th>
                         用户信息
                     </th>
-                    
+                    -->
                     <th>
                         交易信息
                     </th>
-                    
+                    <th>
+                        时间信息
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="item in data.results ">
-                    
-                    <td>
-                         <div><label>账户信息：</label><span>{{item.account}}</span></div>
-                    </td>
                     <td>
                     <div><label>交易类型：</label><span>{{item.type | app_dict}}</span></div>
                     <div><label>交易状态：</label><span>{{item.status | app_dict}}</span></div>
                         <div><label>交易金额(元)：</label><span>{{item.money}}</span></div>
-                        <div><label>交易时间：</label><span>{{item.createDate}}</span></div>
-                        <div><label>审核时间：</label><span>{{item.updateDate}}</span></div>
                         <div><label>交易详情：</label><span>
-                        
+                        <router-link v-bind:to="'/manager-transaction?transactionId='+item.transactionId">交易详情</router-link>
 </span></div>
                         <div v-if="transactionStatus.wait_check == item.status">
                         <label>审核操作：</label><span>
@@ -57,6 +65,10 @@ define(["service/transaction","component/router","filter/app-dict"],function (tr
                         </div>
                         
                     </td>
+                    <td>
+                    <div><label>交易时间：</label><span>{{item.createDate}}</span></div>
+                        <div><label>审核时间：</label><span>{{item.updateDate}}</span></div>
+</td>
                    
                 </tr>
                 </tbody>

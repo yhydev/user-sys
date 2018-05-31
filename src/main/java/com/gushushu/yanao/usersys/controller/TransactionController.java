@@ -9,9 +9,7 @@ import com.gushushu.yanao.usersys.service.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/transaction")
@@ -35,6 +33,10 @@ public class TransactionController {
         return transactionService.offlineWithdraw(offlineWithdrawParam);
     }
 
+    @GetMapping(params = {"transactionId"})
+    public ResponseEntity transaction(String transactionId){
+        return transactionService.detail(transactionId);
+    }
 
     /**
      * 查询交易列表

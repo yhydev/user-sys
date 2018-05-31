@@ -6,6 +6,7 @@ import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.Transaction;
 import com.gushushu.yanao.usersys.model.FrontTransaction;
 import com.gushushu.yanao.usersys.model.QueryData;
+import com.gushushu.yanao.usersys.model.TransactionDetail;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.QBean;
 import org.hibernate.sql.Select;
@@ -20,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.xml.soap.Detail;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +39,9 @@ public interface TransactionService {
 
 
     public  <T>  ResponseEntity<ResponseBody<QueryData<T>>>  search(SearchParam searchParam, QBean<T> qBean);
+
+
+    ResponseEntity<ResponseBody<TransactionDetail>> detail(String transactionId);
 
     /**
      * 线下支付

@@ -11,6 +11,7 @@ import com.gushushu.yanao.usersys.entity.Transaction;
 import com.gushushu.yanao.usersys.model.BackTransaction;
 import com.gushushu.yanao.usersys.model.FrontTransaction;
 import com.gushushu.yanao.usersys.model.QueryData;
+import com.gushushu.yanao.usersys.model.TransactionDetail;
 import com.gushushu.yanao.usersys.repository.OfflinePayRepository;
 import com.gushushu.yanao.usersys.repository.ReceiveAccountRepository;
 import com.gushushu.yanao.usersys.repository.TransactionRepository;
@@ -36,6 +37,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
+import sun.net.ftp.FtpClient;
 
 import static com.gushushu.yanao.usersys.entity.QTransaction.transaction;
 
@@ -73,8 +75,6 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.updateDate,
             transaction.answer,
             transaction.detailId,
-            transaction.member.account,
-            transaction.member.memberId,
             transaction.transactionId
     );
 
@@ -158,7 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
 
                         String memberId = member.getMemberId();
 
-                        Transaction transaction = generate(memberId,OFFLINE_PAY_TYPE,offlineDepositParam.getMoney(),offlinePay.getOffLineId());
+                        Transaction transaction = generate(memberId,OFFLINE_PAY_TYPE,offlineDepositParam.getMoney(),offlinePay.getOfflinePayId());
 
                         transactionRepository.save(transaction);
                         response = ResponseEntityBuilder.success(transaction.getTransactionId());
@@ -266,6 +266,55 @@ public class TransactionServiceImpl implements TransactionService {
         response = ResponseEntityBuilder.<QueryData<T>>success(ret);
 
         logger.info("response = " + response);
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<ResponseBody<TransactionDetail>> detail(String transactionId) {
+
+        System.out.println("transactionId = [" + transactionId + "]");
+
+        Transaction transaction = transactionRepository.findByTransactionId(transactionId);
+        TransactionDetail detail = new TransactionDetail();
+        String errmsg = null;
+        ResponseEntity response = null;
+
+        if(transaction == null){
+            errmsg = "交易不存在";
+        }else{
+            Member member = transaction.getMember();
+            //填充用户信息
+            detail.setAccount(member.getAccount());
+            detail.setInnerDiscAccount(member.getInnerDiscAccount());
+            detail.setName(member.getName());
+            detail.setMemberBankCard(member.getBankCard());
+
+            //填充交易基本信息
+            detail.setMoney(transaction.getMoney());
+            detail.setType(transaction.getType());
+            detail.setStatus(transaction.getStatus());
+        }
+
+        //填充交易详情
+
+        //线下支付信息填充
+        if(OFFLINE_PAY_TYPE.equals(transaction.getType())){
+            OfflinePay offlinePay = offlinePayRepository.findByOfflinePayId(transaction.getDetailId());
+
+            detail.setPayAccount(offlinePay.getPayAccount());
+            detail.setReceiveBankNo(offlinePay.getReceiveBankNo());
+            detail.setReceiveBankName(offlinePay.getReceiveBankName());
+            detail.setReceiveUsername(offlinePay.getReceiveUserName());
+        }
+
+        if(errmsg == null){
+            response = ResponseEntityBuilder.success(detail);
+        }else{
+            response = ResponseEntityBuilder.failed(errmsg);
+        }
+
+        System.out.println("response = " + response);
+
         return response;
     }
 
