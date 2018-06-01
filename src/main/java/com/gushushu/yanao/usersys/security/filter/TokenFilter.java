@@ -1,5 +1,5 @@
 /*
-package com.gushushu.yanao.usersys.filter;
+package com.gushushu.yanao.usersys.security.filter;
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.Member;

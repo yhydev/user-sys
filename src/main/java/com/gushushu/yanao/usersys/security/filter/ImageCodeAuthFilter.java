@@ -1,8 +1,7 @@
-package com.gushushu.yanao.usersys.filter;
+package com.gushushu.yanao.usersys.security.filter;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.gushushu.yanao.usersys.controller.ImageCodeController;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -27,6 +26,11 @@ public class ImageCodeAuthFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+
+
+        /*SecurityContext securityContext = SecurityContextHolder.getContext();
+        System.out.println(securityContext);*/
+
 
         String imageCode = servletRequest.getParameter("imageCode");
 

@@ -25,35 +25,54 @@ define(["Promise","jquery","service/member-session"],function (Promise,$,memberS
     
     var rejectOpenAccount = function (data) {
         return new Promise(function (resolve,reject) {
-            $.ajax({
-                data:data,
-                url:"/member/rejectOpenAccount",
-                success:function (res) {
-                    if(res.success){
-                        resolve(res)
-                    }else{
-                        reject(res)
-                    }
-                },error:reject
-            })
+
+
+            memberSessionService.memberSession.then(function (memberSession) {
+                data.token = memberSession.data.token;
+                if(memberSession.success){
+
+                    $.ajax({
+                        data:data,
+                        url:"/member/rejectOpenAccount",
+                        success:function (res) {
+                            if(res.success){
+                                resolve(res)
+                            }else{
+                                reject(res)
+                            }
+                        },
+                        error:reject
+                    })
+
+                }else{
+                    reject(memberSession)
+                }
+            }).catch(reject)
         })
     }
     
     
     var getMemberList = function (data) {
         return new Promise(function (resolve,reject) {
-            $.ajax({
-                data:data,
-                url:"/member/getMemberList",
-                success:function (res) {
-                    if(res.success){
-                        resolve(res)
-                    }else{
-                        reject(res)
-                    }
-                },
-                error:reject
-            })
+
+
+            memberSessionService.memberSession.then(function (memberSession) {
+                data.token = memberSession.data.token;
+                    $.ajax({
+                    data:data,
+                    url:"/member/getMemberList",
+                    success:function (res) {
+                        if(res.success){
+                            resolve(res)
+                        }else{
+                            reject(res)
+                        }
+                    },
+                    error:reject
+                })
+
+            }).catch(reject)
+
         })
     }
 

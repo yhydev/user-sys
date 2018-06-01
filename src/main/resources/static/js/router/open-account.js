@@ -101,15 +101,6 @@ define(["vue","jquery","service/member-session","service/member","component/uplo
 
 
             `,
-            watch:{
-              "profile":function () {
-                  console.log(this.profile)
-                  console.log(this.profile.openAccountStatus)
-                  console.log(this.openAccountStatus.notApplyFor)
-                  console.log(this.profile.openAccountStatus == this.openAccountStatus.notApplyFor)
-
-              }  
-            },
             props:["token","profile","openAccountStatus"],
             updated:function () {
                 initializeOpenAccountSubmitValidate();

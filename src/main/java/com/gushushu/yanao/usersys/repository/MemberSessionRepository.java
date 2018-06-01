@@ -15,6 +15,8 @@ public interface MemberSessionRepository extends JpaRepository<MemberSession,Str
     @Query("select t.member.id from MemberSession t where t.token = :token")
     String findMemberId(@Param("token") String token);
 
+    @Query("select t.member.type from MemberSession t where t.token = :token")
+    String findMemberTypeByToken(@Param("token") String token);
 
     @Query("select new com.gushushu.yanao.usersys.model.FrontMemberSession(t.member.memberId, t.token, t.member.account) from MemberSession t where t.token = :token")
     FrontMemberSession findSession(@Param("token") String token);

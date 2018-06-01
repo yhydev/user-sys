@@ -29,12 +29,18 @@ define(["vue","vue-router","router/manager-transaction","router/member-list","ro
         },mounted:function () {
 
             var vue = this;
-
             memberSessionService.memberSession.then(function (value) {
                 vue.token = value.data.token;
+                vue.profile = value.data;
             }).catch(function (reason) {
                 location.href = "/manager_login.html";
             })
+        },methods:{
+            quit:function () {
+                $.cookie("token",null);
+                location.reload();
+            }
+
         }
     }).$mount("#app")
 

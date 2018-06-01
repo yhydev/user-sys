@@ -1,21 +1,11 @@
 define(["service/transaction","component/router","filter/app-dict"],
     function (transactionService) {
 
- /*       Vue.use(VueRouter)
-    var routers = [
-
-    ];
-
-    var vueRouter = new VueRouter({
-        routes:routers
-    });*/
-
 
     return {
-   //     router:vueRouter,
         template:`
         
-        <user-template>
+        <router-template>
         <h1 slot="title">交易列表</h1>
         <div slot="content">
                 <div class="row col-md-12" role="form">
@@ -79,7 +69,7 @@ define(["service/transaction","component/router","filter/app-dict"],
             </div>
         </div>
 
-    </user-template>
+    </router-template>
         
         `,
         props:["token","transactionStatus"],

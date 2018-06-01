@@ -293,19 +293,25 @@ public class TransactionServiceImpl implements TransactionService {
             detail.setMoney(transaction.getMoney());
             detail.setType(transaction.getType());
             detail.setStatus(transaction.getStatus());
+
+
+
+            //填充交易详情
+
+            //线下支付信息填充
+            if(OFFLINE_PAY_TYPE.equals(transaction.getType())){
+                OfflinePay offlinePay = offlinePayRepository.findByOfflinePayId(transaction.getDetailId());
+
+                detail.setPayAccount(offlinePay.getPayAccount());
+                detail.setReceiveBankNo(offlinePay.getReceiveBankNo());
+                detail.setReceiveBankName(offlinePay.getReceiveBankName());
+                detail.setReceiveUsername(offlinePay.getReceiveUserName());
+            }
+
+
+
         }
 
-        //填充交易详情
-
-        //线下支付信息填充
-        if(OFFLINE_PAY_TYPE.equals(transaction.getType())){
-            OfflinePay offlinePay = offlinePayRepository.findByOfflinePayId(transaction.getDetailId());
-
-            detail.setPayAccount(offlinePay.getPayAccount());
-            detail.setReceiveBankNo(offlinePay.getReceiveBankNo());
-            detail.setReceiveBankName(offlinePay.getReceiveBankName());
-            detail.setReceiveUsername(offlinePay.getReceiveUserName());
-        }
 
         if(errmsg == null){
             response = ResponseEntityBuilder.success(detail);

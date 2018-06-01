@@ -1,8 +1,10 @@
 package com.gushushu.yanao.usersys.controller;
 
 
+import com.gushushu.yanao.usersys.common.annotation.HandlerRole;
 import com.gushushu.yanao.usersys.entity.ReceiveAccount;
 import com.gushushu.yanao.usersys.service.ReceiveAccountService;
+import com.gushushu.yanao.usersys.service.impl.MemberServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +27,7 @@ public class ReceiveAccountController {
 
 
     @PostMapping
+    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
     public ResponseEntity saveOrUpdate(@Validated  ReceiveAccount receiveAccount){
         return receiveAccountService.saveOrUpdate(receiveAccount);
     }

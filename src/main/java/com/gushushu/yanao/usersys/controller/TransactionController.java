@@ -1,6 +1,7 @@
 package com.gushushu.yanao.usersys.controller;
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.common.annotation.HandlerRole;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.TransactionService;
@@ -33,6 +34,7 @@ public class TransactionController {
         return transactionService.offlineWithdraw(offlineWithdrawParam);
     }
 
+    @HandlerRole({MemberServiceImpl.USER_TYPE,MemberServiceImpl.MANAGER_TYPE})
     @GetMapping(params = {"transactionId"})
     public ResponseEntity transaction(String transactionId){
         return transactionService.detail(transactionId);
@@ -45,6 +47,7 @@ public class TransactionController {
      * @return
      */
     @RequestMapping
+    @HandlerRole({MemberServiceImpl.USER_TYPE,MemberServiceImpl.MANAGER_TYPE})
     public ResponseEntity transactionList(TransactionService.SearchParam searchParam,String token){
 
         ResponseEntity response = null;
@@ -71,20 +74,10 @@ public class TransactionController {
      * @return
      */
     @PutMapping//TODO 管理员权限
+    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
     public ResponseEntity update(TransactionService.UpdateParam updateParam){
         return transactionService.update(updateParam);
     }
-
-
-    /*@RequestMapping("/member")
-    public ResponseEntity getTransaction(TransactionService.SearchParam searchParam,String token){
-
-        memberSessionService.findMemberId(token);
-
-
-
-    }
-*/
 
 
 }

@@ -35,7 +35,6 @@ function(Vue,VueRouter,openAccountRouter,offlineDepositRouter,offlineWithdrawRou
                 location.reload();
             }
         },mounted:function () {
-                this.openAccountStatus = dict.openAccountStatus;
                 memberSessionService.memberSession.then(function (value) {
                     app.token = value.data.token;
                 }).catch(function (reason) {

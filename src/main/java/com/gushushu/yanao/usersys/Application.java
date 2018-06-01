@@ -2,7 +2,7 @@ package com.gushushu.yanao.usersys;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
-import com.gushushu.yanao.usersys.filter.ImageCodeAuthFilter;
+import com.gushushu.yanao.usersys.security.filter.ImageCodeAuthFilter;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
@@ -44,6 +46,8 @@ public class Application {
         filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
+
+
 
 
     @Bean

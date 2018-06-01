@@ -1,12 +1,15 @@
 package com.gushushu.yanao.usersys.controller;
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.common.annotation.HandlerRole;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
+import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.impl.MemberServiceImpl;
+import com.gushushu.yanao.usersys.service.impl.TransactionServiceImpl;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -61,21 +64,21 @@ public class MemberController {
         return memberService.applyForAccount(realNameParam);
     }
 
-    //TODO 管理员权限
+    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
     @RequestMapping("/getMemberList")
     public ResponseEntity openAccountList(MemberService.SearchParam<BackMember> searchParam){
         searchParam.setResultBean(MemberServiceImpl.BACK_MEMBER_QBEAN);
         return memberService.search(searchParam);
     }
 
-
     @RequestMapping("/getFrontMember")
+    @HandlerRole({MemberServiceImpl.USER_TYPE,MemberServiceImpl.MANAGER_TYPE})
     public ResponseEntity getFrontMember(String token){
         return  memberService.getFrontMember(token);
     }
 
-    //TODO 管理员权限
     @RequestMapping("/rejectOpenAccount")
+    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
     public ResponseEntity updateMember(String memberId){
         MemberService.UpdateOneParam updateOneParam = new  MemberService.UpdateOneParam(memberId);
         //用户必须是没有开户
@@ -86,7 +89,7 @@ public class MemberController {
     }
 
 
-    //TODO 管理员权限
+    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
     @RequestMapping("/setInnerDiscAccount")
     public ResponseEntity setInnerDiscAccount(@Validated MemberService.SetInnerDiscAccountParam setInnerDiscAccountParam){
         return memberService.setInnerDiscAccount(setInnerDiscAccountParam);
