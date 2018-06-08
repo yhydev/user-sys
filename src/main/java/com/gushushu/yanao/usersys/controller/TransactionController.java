@@ -1,5 +1,6 @@
 package com.gushushu.yanao.usersys.controller;
 
+import com.gushushu.yanao.usersys.common.QBeans;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.annotation.HandlerRole;
 import com.gushushu.yanao.usersys.entity.Member;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import static com.gushushu.yanao.usersys.service.impl.MemberServiceImpl.*;
+import static com.gushushu.yanao.usersys.service.MemberSessionService.*;
+import static com.gushushu.yanao.usersys.common.QBeans.*;
+
 
 @RestController
 @RequestMapping("/transaction")
@@ -34,7 +39,7 @@ public class TransactionController {
         return transactionService.offlineWithdraw(offlineWithdrawParam);
     }
 
-    @HandlerRole({MemberServiceImpl.USER_TYPE,MemberServiceImpl.MANAGER_TYPE})
+    @HandlerRole({MemberType.USER_TYPE,MemberType.MANAGER_TYPE})
     @GetMapping(params = {"transactionId"})
     public ResponseEntity transaction(String transactionId){
         return transactionService.detail(transactionId);
@@ -46,19 +51,23 @@ public class TransactionController {
      * @param token
      * @return
      */
-    @RequestMapping
-    @HandlerRole({MemberServiceImpl.USER_TYPE,MemberServiceImpl.MANAGER_TYPE})
-    public ResponseEntity transactionList(TransactionService.SearchParam searchParam,String token){
+    @GetMapping("/findList")
+    @HandlerRole({MemberType.USER_TYPE,MemberType.MANAGER_TYPE})
+    public ResponseEntity transactionList(TransactionService.SearchParam searchParam,@CookieValue(value = "token")String token){
 
-        ResponseEntity response = null;
+         ResponseEntity response = null;
 
-         ResponseBody<Member> findMemberresponse = memberSessionService.findMember(token).getBody();
-         if(findMemberresponse.isSuccess()){
-             if(findMemberresponse.getData().getType().equals(MemberServiceImpl.USER_TYPE)){
+         FindOneParam<MemberTypeModel> findOneParam = new FindOneParam(MEMBER_TYPE);
+         findOneParam.setEqToken(token);
+         ResponseBody<MemberTypeModel> memberTypeResponseBody = memberSessionService.findOne(findOneParam).getBody();
+
+         if(memberTypeResponseBody.isSuccess()){
+             MemberTypeModel memberTypeModel = memberTypeResponseBody.getData();
+             if(memberTypeModel.getType().equals(MemberType.USER_TYPE)){
                  //用户查询交易
-                 searchParam.setMemberId(findMemberresponse.getData().getMemberId());
+                 searchParam.setMemberId(memberTypeModel.getMemberId());
                  response = transactionService.search(searchParam,TransactionServiceImpl.FRONT_TRANSACTION_Q_BEAN);
-             }else if(findMemberresponse.getData().getType().equals(MemberServiceImpl.MANAGER_TYPE)){
+             }else if(memberTypeModel.getType().equals(MemberType.MANAGER_TYPE)){
                  //管理员查询交易
                  response = transactionService.search(searchParam,TransactionServiceImpl.BACK_TRANSACTION_Q_BEAN);
              }
@@ -74,7 +83,7 @@ public class TransactionController {
      * @return
      */
     @PutMapping//TODO 管理员权限
-    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
+    @HandlerRole({MemberType.MANAGER_TYPE})
     public ResponseEntity update(TransactionService.UpdateParam updateParam){
         return transactionService.update(updateParam);
     }

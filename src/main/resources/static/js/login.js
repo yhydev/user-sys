@@ -1,15 +1,22 @@
 
 
-require(["jquery","jquery-form","jquery-validator","session"],function(){
+require(["jquery","service/member-session","jquery-form","jquery-validator"],function($,sessionService){
 
 
     $(document).ready(function () {
 
-        function toIndex() {
-            location.href = "index.html";
+        var pages ={
+            manager:"/manager_index.html",
+            user:"/index.html"
         }
-        
-        $.autoLogin(toIndex);
+
+        sessionService.findOne({token:$.cookie("token")}).then(function (value) {
+            var page = pages[value.data.type];
+            if(page){
+                location.href = page;
+            }
+        }).catch(function (reason) {  })
+
 
         // 在键盘按下并释放及提交后验证提交表单
         $("#login-box").validate({
@@ -42,7 +49,8 @@ require(["jquery","jquery-form","jquery-validator","session"],function(){
                 $(form).ajaxSubmit({
                     success:function(res){
                         if(res.success){
-                            $.tokenLogin(res.data.token,toIndex);
+                            $.cookie("token",res.data.token,{expired:30})
+                            location.reload();
                         }else{
                             alert(res.message);
                         }

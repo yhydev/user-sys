@@ -1,3 +1,4 @@
+/*
 package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.Application;
@@ -82,4 +83,4 @@ public class MemberSessionServiceImplTest {
         memberSessionService.saveSession("333333");
 
     }
-}
+}*/

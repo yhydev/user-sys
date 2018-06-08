@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import static com.gushushu.yanao.usersys.common.QBeans.*;
+import static com.gushushu.yanao.usersys.service.impl.MemberServiceImpl.*;
 
 @RestController
 @RequestMapping("/receiveAccount")
@@ -27,7 +29,7 @@ public class ReceiveAccountController {
 
 
     @PostMapping
-    @HandlerRole({MemberServiceImpl.MANAGER_TYPE})
+    @HandlerRole({MemberType.MANAGER_TYPE})
     public ResponseEntity saveOrUpdate(@Validated  ReceiveAccount receiveAccount){
         return receiveAccountService.saveOrUpdate(receiveAccount);
     }

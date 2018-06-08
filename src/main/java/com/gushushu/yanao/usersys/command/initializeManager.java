@@ -28,10 +28,10 @@ public class initializeManager implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Long count = memberRepository.countByType(MemberServiceImpl.MANAGER_TYPE);
+        Long count = memberRepository.countByType(MemberServiceImpl.MemberType.MANAGER_TYPE);
         if(count == 0){
             MemberService.CreateParam createParam = new MemberService.CreateParam();
-            createParam.setType(MemberServiceImpl.MANAGER_TYPE);
+            createParam.setType(MemberServiceImpl.MemberType.MANAGER_TYPE);
             createParam.setAccount(ACCOUNT);
             createParam.setPassword(PASSWORD);
             memberService.create(createParam);

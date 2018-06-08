@@ -34,7 +34,11 @@ public interface MemberService {
     //找回密码验证码类型
     public final static String VCODE_TYPE_VERIFICATION_CODE = "findPassword";
 
-    ResponseEntity<ResponseBody<FrontMember>> getFrontMember(String token);
+
+    String findMemberId(String account, String password);
+
+
+
 
     ResponseEntity<ResponseBody<String>> setInnerDiscAccount(SetInnerDiscAccountParam setInnerDiscAccountParam);
 
@@ -42,7 +46,7 @@ public interface MemberService {
 
     ResponseEntity<ResponseBody<FrontMemberSession>> login(LoginParam loginParam);
 
-    public <T> ResponseEntity<ResponseBody<QueryData<T>>> search(SearchParam<T> searchParam);
+    <T> ResponseEntity<ResponseBody<QueryData<T>>> search(SearchParam<T> searchParam);
 
     ResponseEntity<ResponseBody> applyForAccount(ApplyForAccountParam param);
 
@@ -222,14 +226,24 @@ public interface MemberService {
 
     public static class SearchParam<ResultBean> extends PageParam {
         private String openAccountStatus;
+        private String type;
         private QBean<ResultBean> resultBean;
 
         @Override
         public String toString() {
             return "SearchParam{" +
-                    ", openAccountStatus='" + openAccountStatus + '\'' +
+                    "openAccountStatus='" + openAccountStatus + '\'' +
+                    ", type='" + type + '\'' +
                     ", resultBean=" + resultBean +
                     "} " + super.toString();
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
 
         public QBean<ResultBean> getResultBean() {
@@ -253,12 +267,22 @@ public interface MemberService {
     public static class CreateParam extends LoginParam{
 
         private String type;
+        private String proxyId;
 
         @Override
         public String toString() {
             return "CreateParam{" +
                     "type='" + type + '\'' +
+                    ", proxyId='" + proxyId + '\'' +
                     "} " + super.toString();
+        }
+
+        public String getProxyId() {
+            return proxyId;
+        }
+
+        public void setProxyId(String proxyId) {
+            this.proxyId = proxyId;
         }
 
         public String getType() {

@@ -1,9 +1,8 @@
 package com.gushushu.yanao.usersys.service.impl;
 
-import com.gushushu.yanao.usersys.common.JpaQueryUtils;
+import com.gushushu.yanao.usersys.common.QBeans;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
-import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.OfflinePay;
 import com.gushushu.yanao.usersys.entity.ReceiveAccount;
@@ -22,23 +21,15 @@ import java.util.Date;
 import javax.transaction.Transactional;
 import com.gushushu.yanao.usersys.service.ValidateService;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.annotation.Validated;
-import sun.net.ftp.FtpClient;
-
 import static com.gushushu.yanao.usersys.entity.QTransaction.transaction;
 
 @Service
@@ -119,6 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 
 
+
     @Override
     @Transactional
     public ResponseEntity<ResponseBody<String>> offlineDeposit(OfflineDepositParam offlineDepositParam) {
@@ -135,13 +127,16 @@ public class TransactionServiceImpl implements TransactionService {
             }else if(receiveAccountRepository.existsByBankNo(offlineDepositParam.getPayAccount())) {// 支付银行卡是否存在于收款账户
                 errmsg = "转账银行卡为无效的卡号";
             }else{
-                ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlineDepositParam.getToken());
-                Member member = findMemberResponse.getBody().getData();
+                MemberSessionService.FindOneParam findOneParam =
+                        new MemberSessionService.FindOneParam(QBeans.MEMBER_OPEN_ACCOUNT_STATUS);
+                findOneParam.setEqToken(offlineDepositParam.getToken());
+                ResponseEntity<ResponseBody<QBeans.MemberOpenAccountModel>> findMemberResponse = memberSessionService.findOne(findOneParam);
+                QBeans.MemberOpenAccountModel memberOpenAccountModel = findMemberResponse.getBody().getData();
 
                 //用户是否存在
                 if(!findMemberResponse.getBody().isSuccess()){
                     errmsg = findMemberResponse.getBody().getMessage();
-                }else if(!MemberServiceImpl.OpenAccountStatus.OPEN_ACCOUNT.equals(member.getOpenAccountStatus())){//是否开通交易账户
+                }else if(!MemberServiceImpl.MemberOpenAccountStatus.OPEN_ACCOUNT.equals(memberOpenAccountModel.getOpenAccountStatus())){//是否开通交易账户
                     errmsg = "您还未开通交易账户，暂不能交易";
                 }else{
 
@@ -156,9 +151,9 @@ public class TransactionServiceImpl implements TransactionService {
                         offlinePay.setReceiveUserName(receiveAccount.getUsername());
                         offlinePayRepository.save(offlinePay);
 
-                        String memberId = member.getMemberId();
-
-                        Transaction transaction = generate(memberId,OFFLINE_PAY_TYPE,offlineDepositParam.getMoney(),offlinePay.getOfflinePayId());
+                        Transaction transaction = generate(memberOpenAccountModel.getMemberId()
+                                ,OFFLINE_PAY_TYPE
+                                ,offlineDepositParam.getMoney(),offlinePay.getOfflinePayId());
 
                         transactionRepository.save(transaction);
                         response = ResponseEntityBuilder.success(transaction.getTransactionId());
@@ -179,6 +174,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
+
+
     @Override
     @Transactional
     public ResponseEntity<ResponseBody<String>> offlineWithdraw(OfflineWithdrawParam offlineWithdrawParam) {
@@ -187,16 +184,22 @@ public class TransactionServiceImpl implements TransactionService {
         ResponseEntity<ResponseBody<String>> response = null;
         String errmsg = null;
 
-        ResponseEntity<ResponseBody<Member>> findMemberResponse = memberSessionService.findMember(offlineWithdrawParam.getToken());
+        MemberSessionService.FindOneParam findOneParam =
+                new MemberSessionService.FindOneParam(QBeans.MEMBER_OPEN_ACCOUNT_STATUS);
+        findOneParam.setEqToken(offlineWithdrawParam.getToken());
+        ResponseEntity<ResponseBody<QBeans.MemberOpenAccountModel>> rep = memberSessionService.findOne(findOneParam);
+
 
         //判断用户是否存在
-        if(findMemberResponse.getBody().isSuccess()){
+        if(rep.getBody().isSuccess()){
 
-            Member member = findMemberResponse.getBody().getData();
+            QBeans.MemberOpenAccountModel memberOpenAccountModel = rep.getBody().getData();
             //判断用户是否开户
-            if(MemberServiceImpl.OpenAccountStatus.OPEN_ACCOUNT.equals(member.getOpenAccountStatus())){
+            if(MemberServiceImpl.MemberOpenAccountStatus.OPEN_ACCOUNT
+                    .equals(memberOpenAccountModel.getOpenAccountStatus())){
 
-                Transaction transaction = generate(member.getMemberId(),OFFLINE_WITHDRAW_TYPE,offlineWithdrawParam.getMoney());
+                Transaction transaction = generate(memberOpenAccountModel.getMemberId()
+                        ,OFFLINE_WITHDRAW_TYPE,offlineWithdrawParam.getMoney());
                 transactionRepository.save(transaction);
                 response = ResponseEntityBuilder.success(transaction.getTransactionId());
 
@@ -205,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
 
         }else{
-            errmsg = findMemberResponse.getBody().getMessage();
+            errmsg = rep.getBody().getMessage();
         }
 
         if(errmsg != null){

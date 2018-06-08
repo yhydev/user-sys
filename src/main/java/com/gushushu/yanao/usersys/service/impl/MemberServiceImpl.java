@@ -1,38 +1,26 @@
 package com.gushushu.yanao.usersys.service.impl;
 
+import com.gushushu.yanao.usersys.common.QBeans;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
-import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import com.gushushu.yanao.usersys.entity.Member;
-import com.gushushu.yanao.usersys.entity.MemberSession;
 import com.gushushu.yanao.usersys.entity.QMember;
-import com.gushushu.yanao.usersys.model.BackMember;
-import com.gushushu.yanao.usersys.model.FrontMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import com.gushushu.yanao.usersys.model.QueryData;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.service.MemberService;
-import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
+import com.gushushu.yanao.usersys.service.RelationService;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.support.QueryBase;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,36 +30,20 @@ public class MemberServiceImpl implements MemberService {
 
     final static Logger logger = Logger.getLogger(MemberServiceImpl.class);
 
-    public final static String USER_TYPE = "user";
-    public final static String MANAGER_TYPE = "manager";
+    public  static class MemberType {
+        public final static String USER_TYPE = "user";
+        public final static String MANAGER_TYPE = "manager";
+        public final static String PROXY_TYPE = "proxy";
 
+    }
 
-    public  static class OpenAccountStatus{
+    public  static class MemberOpenAccountStatus{
         public static String APPLY_FOR = "apply_for";
         public static String NOT_APPLY_FOR = "not_apply_for";
         public static String OPEN_ACCOUNT = "open_account";
         public static String REJECT = "reject";
 
     }
-
-    public static QBean<BackMember> BACK_MEMBER_QBEAN = Projections.bean(
-            BackMember.class,
-            member.memberId,
-            member.account,//账户 (手机号)
-            member.createDate,// 创建日期
-            member.openAccountStatus,//是否已经开户
-            member.name, //姓名
-            member.idCard, //身份证
-            member.idCardFrontUrl, //身份证正面
-            member.idCardBehindUrl, //身份证反面
-            member.bankCard,//银行卡
-            member.phoneNumber,//银行卡预留手机号
-            member.applyForOpenAccountDate,//实名时间
-            member.innerDiscAccount,//内盘账户
-            member.setInnerDiscDate//设置内盘账户日期
-    );
-
-
 
     //用户token 超时时间(单位秒)
     final static int USER_TOKEN_TIMEOUT = 1800;
@@ -84,29 +56,23 @@ public class MemberServiceImpl implements MemberService {
     private MemberSessionService memberSessionService;
 
     @Autowired
-    private IdentifyingCodeService identifyingCodeService;
+    private RelationService relationService;
 
     @Autowired
     private JPAQueryFactory jpaQueryFactory;
 
+
     @Override
-    public ResponseEntity<ResponseBody<FrontMember>> getFrontMember(String token) {
+    public String findMemberId(String account, String password) {
 
-        logger.info("token = [" + token + "]");
 
-        ResponseEntity<ResponseBody<FrontMember>> response = null;
+        String memberId = jpaQueryFactory.select(member.memberId).where(
+                member.account.eq(account),
+                member.password.eq(password)
+        ).fetchOne();
 
-        ResponseEntity<ResponseBody<String>> findMemberIdResponse = memberSessionService.findMemberId(token);
-        if(findMemberIdResponse.getBody().isSuccess()){
-            FrontMember frontMember = memberRepository.findFront(findMemberIdResponse.getBody().getData());
-            response = ResponseEntityBuilder.success(frontMember);
-        }else{
-            response = ResponseEntityBuilder.failed(findMemberIdResponse.getBody().getMessage());
-        }
 
-        logger.info("response = " + response);
-
-        return response;
+        return memberId;
     }
 
     @Override
@@ -122,15 +88,16 @@ public class MemberServiceImpl implements MemberService {
 
         if(member == null){
             errmsg = "未知 member";
-        }else if(!OpenAccountStatus.APPLY_FOR.equals(member.getOpenAccountStatus())){
+        }else if(!MemberOpenAccountStatus.APPLY_FOR.equals(member.getOpenAccountStatus())){
             errmsg = "用户未实名";
         }else{
             member.setApplyForOpenAccountDate(new Date());
             member.setInnerDiscAccount(setInnerDiscAccountParam.getInnerDiscAccount());
-            member.setOpenAccountStatus(OpenAccountStatus.OPEN_ACCOUNT);
-            memberRepository.save(member);
-            response = ResponseEntityBuilder.success(member.getMemberId());
+            member.setOpenAccountStatus(MemberOpenAccountStatus.OPEN_ACCOUNT);
 
+            memberRepository.save(member);
+
+            response = ResponseEntityBuilder.success(member.getMemberId());
         }
 
         if(errmsg != null){
@@ -150,24 +117,32 @@ public class MemberServiceImpl implements MemberService {
 
         ResponseEntity<ResponseBody<FrontMemberSession>> response = null;
         String errmsg = null;
-        Long accountCount = memberRepository.countByAccount(createParam.getAccount());
 
-        //手机号是否存在
-        if(accountCount != 0){
+        //手机号是否存在(如果手机号是 null 或 空字符 则不验证)
+        if(!StringUtils.isEmpty(createParam.getAccount()) && memberRepository.countByAccount(createParam.getAccount()) != 0){
             errmsg = "此手机号已被注册.";
         }else{
+
+            //创建用户
             Member member = new Member();
             member.setCreateDate(new Date());
             member.setPassword(createParam.getPassword());
             member.setAccount(createParam.getAccount());
             member.setBalance(0L);
-            member.setOpenAccountStatus(OpenAccountStatus.NOT_APPLY_FOR);
+            member.setOpenAccountStatus(MemberOpenAccountStatus.NOT_APPLY_FOR);
             member.setType(createParam.getType());
+
             memberRepository.save(member);
 
-            response = memberSessionService.saveSession(member.getMemberId());
-        }
+            //创建用户与代理之间的关系
+            RelationService.CreateParam relationCreateParam = new RelationService.CreateParam();
+            relationCreateParam.setProxyId(createParam.getProxyId());
+            relationCreateParam.setMemberId(member.getMemberId());
+            relationService.create(relationCreateParam);
 
+            response = memberSessionService.create(member.getMemberId());
+
+        }
 
         if(errmsg != null){
             response = ResponseEntityBuilder.failed(errmsg);
@@ -194,7 +169,7 @@ public class MemberServiceImpl implements MemberService {
         if(memberId == null){
             response = ResponseEntityBuilder.failed("账号或密码错误.");
         }else{
-            response = memberSessionService.saveSession(memberId);
+            response = memberSessionService.create(memberId);
         }
 
         logger.info("response = " + response);
@@ -211,15 +186,37 @@ public class MemberServiceImpl implements MemberService {
             predicates.add(predicate);
         }
 
+        if(!StringUtils.isEmpty(searchParam.getType())){
+            Predicate predicate = member.type.eq(searchParam.getType());
+            predicates.add(predicate);
+        }
+
         return predicates;
     }
+
+
+    public ResponseEntity<ResponseBody<Member>> findOne(String memberId){
+
+        System.out.println("memberId = [" + memberId + "]");
+        ResponseEntity response = null;
+        Member member = memberRepository.findByMemberId(memberId);
+
+        if(member == null){
+            response = ResponseEntityBuilder.failed("无效的用户");
+        }else{
+            response = ResponseEntityBuilder.success(member);
+        }
+        System.out.println("response = " + response);
+        return response;
+    }
+
 
     @Override
     public <T> ResponseEntity<ResponseBody<QueryData<T>>> search(SearchParam<T> searchParam) {
 
         System.out.println("searchParam = " + searchParam);
 
-        ResponseEntity<ResponseBody<QueryData<T>>> response;
+        ResponseEntity<ResponseBody<QueryData<T>>> response = null;
 
         List<Predicate> predicates = generatePredicate(searchParam);
         Predicate[] predicateArray = new Predicate[predicates.size()];
@@ -241,6 +238,11 @@ public class MemberServiceImpl implements MemberService {
         return response;
     }
 
+
+
+
+
+
     @Override
     @Transactional
     public ResponseEntity<ResponseBody> applyForAccount(ApplyForAccountParam applyForAccountParam){
@@ -249,21 +251,26 @@ public class MemberServiceImpl implements MemberService {
         String errmsg = null;
         ResponseEntity response = null;
 
-        ResponseEntity<ResponseBody<Member>> rep = memberSessionService.findMember(applyForAccountParam.getToken());
+        MemberSessionService.FindOneParam findOneParam =
+                new MemberSessionService.FindOneParam(QBeans.MEMBER_OPEN_ACCOUNT_STATUS);
+        findOneParam.setEqToken(applyForAccountParam.getToken());
+        ResponseEntity<ResponseBody<QBeans.MemberOpenAccountModel>> rep = memberSessionService.findOne(findOneParam);
 
         if(rep.getBody().isSuccess()){
 
-            Member member = rep.getBody().getData();
-            if(OpenAccountStatus.OPEN_ACCOUNT.equals(member.getOpenAccountStatus())){
+            QBeans.MemberOpenAccountModel openAccountModel = rep.getBody().getData();
+            if(MemberOpenAccountStatus.OPEN_ACCOUNT.equals(openAccountModel.getOpenAccountStatus())){
                 errmsg = "您已经申请开户";
             }else{
-                Long idCardCount = memberRepository.countByIdCardAndStatus(applyForAccountParam.getIdCard(),OpenAccountStatus.APPLY_FOR);
-                idCardCount += memberRepository.countByIdCardAndStatus(applyForAccountParam.getIdCard(),OpenAccountStatus.OPEN_ACCOUNT);
+                Long idCardCount = memberRepository.countByIdCardAndStatus(applyForAccountParam.getIdCard(),MemberOpenAccountStatus.APPLY_FOR);
+                idCardCount += memberRepository.countByIdCardAndStatus(applyForAccountParam.getIdCard(),MemberOpenAccountStatus.OPEN_ACCOUNT);
 
                 //判断此身份证是否开户
                 if(idCardCount > 0){
                     errmsg = "此身份证号已开户,请更换身份证号码";
                 }else{
+
+                    Member member = memberRepository.findByMemberId(openAccountModel.getMemberId());
 
                     member.setIdCard(applyForAccountParam.getIdCard());
                     member.setName(applyForAccountParam.getName());
@@ -272,11 +279,11 @@ public class MemberServiceImpl implements MemberService {
                     member.setIdCardFrontUrl(applyForAccountParam.getIdCardFrontUrl());
                     member.setPhoneNumber(applyForAccountParam.getPhoneNumber());
                     member.setApplyForOpenAccountDate(new Date());
-                    member.setOpenAccountStatus(OpenAccountStatus.APPLY_FOR);
+                    member.setOpenAccountStatus(MemberOpenAccountStatus.APPLY_FOR);
 
                     memberRepository.save(member);
 
-                    response = ResponseEntityBuilder.success(null);
+                    response = ResponseEntityBuilder.success(openAccountModel.getMemberId());
                 }
             }
 
@@ -332,191 +339,6 @@ public class MemberServiceImpl implements MemberService {
         return response;
     }
 
-
-
-
-    /*
-
-    @Transactional
-    public ResponseEntity<Member> findPassword(String account, String phoneCode, String password) {
-
-        logger.info("-----Method:\tfindPassword----");
-        logger.info("param:\taccount:\t"+account);
-        logger.info("param:\tphoneCode:\t"+phoneCode);
-        logger.info("param:\tpassword:\t"+password);
-
-        if(StringUtils.isEmpty(password)){
-            String errmsg = "invalid password";
-            logger.info(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else{
-        	ResponseEntity<PhoneVCode> verRE = verificationCodeService.validateCode(account,FIND_PASSWORD_VERIFICATION_CODE,phoneCode);
-            if(verRE.getStatusCode() == HttpStatus.OK){//判断验证码
-                String encodePassword = SecretEncode.md5(password);
-               Integer updateCount = MemberRepository.updatePassword(account,encodePassword);
-               if(updateCount == 1){
-                   return new ResponseEntity<Member>(HttpStatus.OK);
-               }else{
-                   String errmsg = "invalid account";
-                   logger.info(errmsg);
-                   return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-               }
-            }else{
-            	 return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, "验证码错误");
-            }
-        }
-    }
-
-    @Transactional
-    public ResponseEntity<Member> updatePassword(String userId, String password,String newPassword) {
-
-        logger.info("-----Method:\tupdatePassword----");
-        logger.info("param:\tuserId:\t"+userId);
-        logger.info("param:\tpassword:\t"+password);
-        logger.info("param:\tnewPassword:\t"+newPassword);
-
-        //判断旧密码是否错误
-        if(StringUtils.isEmpty(password) || StringUtils.isEmpty(newPassword)){
-            String errmsg = "password or newPassword invalid";
-            logger.warn(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else if(password.equals(password)){
-            String errmsg = "新密码不能与旧密码相同";
-            logger.warn(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        } else{
-            String encodePassword = SecretEncode.md5(password);
-            String encodeNewPassword = SecretEncode.md5(newPassword);
-
-            Integer updateCount = MemberRepository.updatePassword(userId,encodePassword,encodeNewPassword);
-            if(updateCount == 1){
-                return new ResponseEntity<Member>(HttpStatus.OK);
-            }else{
-                String errmsg = "旧密码无效";
-                logger.info(errmsg);
-                return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-            }
-        }
-    }
-
-    @Transactional
-    public ResponseEntity<Member> updateEmail(String userId, String password,String email) {
-
-        logger.info("-----Method:\tupdateEmail----");
-        logger.info("param:\tuserId:\t"+userId);
-        logger.info("param:\temail:\t"+email);
-        logger.info("param:\tpassword:\t"+password);
-
-        if(StringUtils.isEmpty(password)){
-            String errmsg = "password invalid";
-            logger.info(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else if(StringUtils.isEmpty(email) || !Pattern.matches(".+@.+\\..+",email)){
-            String errmsg = "email invalid";
-            logger.info(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else{
-            String encodePassword = SecretEncode.md5(password);
-
-            Integer updateCount = MemberRepository.updateEmail(userId, encodePassword, email);
-            if(updateCount == 1){
-                return new ResponseEntity<Member>(HttpStatus.OK);
-            }else{
-                String errmsg = "密码错误";
-                logger.info(errmsg);
-                return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-            }
-        }
-    }
-
-    @Transactional
-    public ResponseEntity<Member> update(String userId, BankInfo bankInfo, IdInfo idInfo) {
-
-        logger.info("-----Method:\tupdate----");
-        logger.info("param:\tuserId:\t"+userId);
-        logger.info("param:\tbankInfo:\t"+bankInfo);
-        logger.info("param:\tidInfo:\t"+idInfo);
-
-        Member Member = MemberRepository.findOne(userId);
-
-        //TODO 认证身份证和姓名
-
-        //TODO 认证银行卡和身份证
-
-        //TODO 获取银行卡类型
-
-        if(Member == null){
-            String errmsg  = "invalid userId";
-            logger.warn(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else if(!StringUtils.isEmpty(Member.getId())){
-            String errmsg  = "您已实名认证,无需再次认证";
-            logger.warn(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else{
-
-            Integer updateCount = MemberRepository.update(userId,idInfo.getId(),idInfo.getName(),
-                    bankInfo.getBankCardNo(),bankInfo.getBankName());
-            // TODO 发送短信通知管理员
-            return new ResponseEntity<Member>(HttpStatus.OK);
-        }
-    }
-
-    @Transactional
-    public ResponseEntity<Member> updateMoney(String userId,Long money){
-
-        logger.info("-----Method:\tupdateMoney----");
-
-        logger.info("param:\tuserId:\t"+userId);
-        logger.info("param:\tmoney:\t"+money);
-
-        if(money == null || money == 0){
-            String errmsg = "invalid money";
-            logger.warn(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else{
-
-            if(money > 0){
-                MemberRepository.updateBalance(userId,money);
-                return new ResponseEntity<Member>(HttpStatus.OK);
-            }else{
-                Member Member = MemberRepository.findOne(userId);
-                if(Member.getBalance() >= ~money+1){
-                    MemberRepository.updateBalance(userId,money);
-                    return new ResponseEntity<Member>(HttpStatus.OK);
-                }else{
-                    String errmsg = "账户余额不足";
-                    logger.warn(errmsg);
-                    return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-                }
-            }
-
-        }
-    }
-
-    @Override
-    public ResponseEntity<Member> updateOuterDiscAccount(String userId, String outerDiscAccount) {
-
-        logger.info("------Method:\tMemberServiceImpl.updateOuterDiscAccount");
-        logger.info("userId = [" + userId + "], outerDiscAccount = [" + outerDiscAccount + "]");
-
-        int updateCount = MemberRepository.updateOuterDiscAccount(userId,outerDiscAccount);
-
-        if(updateCount == 1){
-            return new ResponseEntity<Member>(HttpStatus.OK);
-        }else if(updateCount == 0){
-            String errmsg = "invalid userId or outerDiscAccount";
-            logger.warn(errmsg);
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, errmsg);
-        }else{
-            logger.error("------Method:\tMemberServiceImpl.updateOuterDiscAccount");
-            logger.error("userId = [" + userId + "], outerDiscAccount = [" + outerDiscAccount + "]");
-            logger.error("updateCount = " + updateCount);
-            
-            return new ResponseEntityBuilder<Member>().builder(HttpStatus.BAD_REQUEST, ERROR, "错误");
-        }
-    }
-*/
 
 
 

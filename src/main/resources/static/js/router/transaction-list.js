@@ -1,8 +1,11 @@
-define(["vue","jquery","service/transaction","component/router","jquery-form","validator-utils","filter/app-dict"],function (Vue,$,transactionService) {
+define(["service/transaction",
+    "component/router","filter/app-dict"],function (transactionService) {
 
     return {
         /*props:["profile"],*/
         template:"#transaction-list-template",
+     //   template:`<div>{{token}}</div>`,
+        props:["token"],
         data:function () {
             return {
                data:{}
@@ -14,10 +17,13 @@ define(["vue","jquery","service/transaction","component/router","jquery-form","v
         },methods:{
           load:function () {
               var vue = this;
-              transactionService.list(this.$route.query).then(function (value) {
+
+              transactionService.findList(this.$route.query).then(function (value) {
                   if(value.success){
                       vue.data = value.data;
                   }
+              }).catch(function (reason) {
+                  alert(reason.message)
               })
           }  
         },mounted:function () {

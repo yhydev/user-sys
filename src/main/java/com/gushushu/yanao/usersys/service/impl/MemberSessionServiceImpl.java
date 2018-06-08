@@ -4,11 +4,16 @@ import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.MemberSession;
+import com.gushushu.yanao.usersys.entity.QMemberSession;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
 import com.gushushu.yanao.usersys.repository.MemberSessionRepository;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.util.CollectionUtils;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -30,43 +38,34 @@ public class MemberSessionServiceImpl implements MemberSessionService {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Override
-    public ResponseEntity findMemberId(String token){
+    @Autowired
+    private JPAQueryFactory jpaQueryFactory;
 
-        logger.info("token = [" + token + "]");
-
-        ResponseEntity responseEntity = null;
-
-        String memberId = memberSessionRepository.findMemberId(token);
-
-        if (memberId == null){
-            responseEntity = ResponseEntityBuilder.failed("会话到期.");
-        }else{
-            responseEntity = ResponseEntityBuilder.success(memberId);
-        }
-
-        logger.info("responseEntity = " + responseEntity);
-
-        return responseEntity;
-    }
 
     @Override
-    public ResponseEntity<ResponseBody<FrontMemberSession>> findSession(String token) {
+    public <T> ResponseEntity<ResponseBody<T>> findOne(FindOneParam<T> findOneParam) {
 
-        logger.info("token = [" + token + "]");
+        System.out.println("findOneParam = [" + findOneParam + "]");
 
-        ResponseEntity response = null;
+        ResponseEntity<ResponseBody<T>> response = null;
+        String errmsg = null;
+        List<Predicate> predicates  = new ArrayList<>();
 
-        FrontMemberSession frontMemberSession = memberSessionRepository.findSession(token);
-
-        if (frontMemberSession == null){
-            response = ResponseEntityBuilder.failed("会话超时");
-        }else{
-            response = ResponseEntityBuilder.<FrontMemberSession>success(frontMemberSession);
+        if(!StringUtils.isEmpty(findOneParam.getEqToken())){
+            Predicate predicate = QMemberSession.memberSession.token.eq(findOneParam.getEqToken());
+            predicates.add(predicate);
         }
 
+        Predicate predicate[] = new Predicate[predicates.size()];
+        predicates.toArray(predicate);
 
+        T result = jpaQueryFactory.select(findOneParam.getSelect()).from(QMemberSession.memberSession).where(predicate).fetchOne();
 
+        if(result == null){
+            response = ResponseEntityBuilder.failed("token 过期或无效");
+        }else{
+            response = ResponseEntityBuilder.success(result);
+        }
 
         logger.info("response = " + response);
 
@@ -74,30 +73,8 @@ public class MemberSessionServiceImpl implements MemberSessionService {
     }
 
     @Override
-    public ResponseEntity findMember(String token) {
-
-        logger.info("token = " + token);
-
-        ResponseEntity responseEntity = null;
-
-        MemberSession memberSession = memberSessionRepository.findByToken(token);
-
-        if (memberSession == null){
-            responseEntity = ResponseEntityBuilder.failed("会话超时");
-        }else{
-            responseEntity = ResponseEntityBuilder.<Member>success(memberSession.getMember());
-        }
-
-        logger.info("responseEntity = " + responseEntity);
-
-        return responseEntity;
-    }
-
-
-
-    @Override
     @Transactional
-    public ResponseEntity saveSession(String memberId) {
+    public ResponseEntity create(String memberId) {
         logger.info("memberId = [" + memberId + "]");
 
         MemberSession memberSession = new MemberSession();
@@ -119,4 +96,9 @@ public class MemberSessionServiceImpl implements MemberSessionService {
 
         return ResponseEntityBuilder.success(frontMemberSession);
     }
+
+
+
+
+
 }

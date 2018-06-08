@@ -1,14 +1,12 @@
 define(["service/transaction","component/router","filter/app-dict"],
     function (transactionService) {
-
-
     return {
         template:`
         
         <router-template>
         <h1 slot="title">交易列表</h1>
         <div slot="content">
-                <div class="row col-md-12" role="form">
+                <div class="row col-md-12">
                     <div>
                        <label>交易类型：</label>
                        <a href="javascript:;" v-bind:class="{active:!$route.query.type}" v-on:click="query({'type':'all'})">全部</a>
@@ -72,7 +70,7 @@ define(["service/transaction","component/router","filter/app-dict"],
     </router-template>
         
         `,
-        props:["token","transactionStatus"],
+        props:["transactionStatus"],
         data:function () {
             return {
                 data:{},
@@ -99,8 +97,7 @@ define(["service/transaction","component/router","filter/app-dict"],
             },
             load:function () {
                 var vue = this;
-                var query = JSON.parse(JSON.stringify(this.$route.query))
-                transactionService.list(query).then(function (value) {
+                transactionService.findList(this.$route.query).then(function (value) {
                     vue.data = value.data;
                 }).catch(function (reason) {
                     alert(reason.message)
@@ -118,7 +115,6 @@ define(["service/transaction","component/router","filter/app-dict"],
                 if(isEnter){
                     var params = {transactionId:transactionId,success:status};
                     var vue = this;
-
                     transactionService.update(params).then(function (value) {
                         vue.$router.go(0);
                     }).catch(function (reason) {
@@ -130,7 +126,6 @@ define(["service/transaction","component/router","filter/app-dict"],
             }
         },watch:{
             "$route":function () {
-                console.log(111)
                 this.load();
             }
         },mounted:function () {

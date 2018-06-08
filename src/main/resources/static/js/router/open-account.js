@@ -40,9 +40,6 @@ define(["vue","jquery","service/member-session","service/member","component/uplo
 
         return {
             template:`
-
-
-
                  <user-template>
                 <h3 slot="title">内盘期货开户</h3>
                 <div slot="content">

@@ -12,9 +12,10 @@ public class BackMember {
     @JsonSerialize(using = DateSerialize.class)
     private Date createDate;// 创建日期
 
-    private String openAccountStatus;//是否已经开户
+    private String openAccountStatus;//开户状态
 
-    private String name; //姓名
+    private String type;//用户类型
+    /*private String name; //姓名
     private String idCard; //身份证
     private String idCardFrontUrl; //身份证正面
     private String idCardBehindUrl; //身份证反面
@@ -27,7 +28,7 @@ public class BackMember {
     @JsonSerialize(using = DateSerialize.class)
     private Date setInnerDiscDate;//设置内盘账户日期
 
-
+*/
     public String getMemberId() {
         return memberId;
     }
@@ -60,7 +61,7 @@ public class BackMember {
         this.openAccountStatus = openAccountStatus;
     }
 
-    public String getName() {
+    /*public String getName() {
         return name;
     }
 
@@ -149,5 +150,5 @@ public class BackMember {
                 ", innerDiscAccount='" + innerDiscAccount + '\'' +
                 ", setInnerDiscDate=" + setInnerDiscDate +
                 '}';
-    }
+    }*/
 }

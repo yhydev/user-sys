@@ -6,7 +6,14 @@ require(["vue"],function (Vue) {
         failed:"交易失败",
         success:"交易成功",
         wait_check:"等待审核",
-        all:"全部"
+        all:"全部",
+        manager:"管理员",
+        user:"普通用户",
+        proxy:"代理用户",
+        not_apply_for:"未申请",
+        apply_for:"已申请",
+        open_account:"已开户",
+        reject:"未开户"
 
     }
 

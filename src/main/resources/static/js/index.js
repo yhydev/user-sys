@@ -1,5 +1,8 @@
-require(["vue","vue-router","router/open-account","router/offline-deposit","router/offline-withdraw","router/transaction-list","service/member-session","service/member","dict","bootstrap"],
-function(Vue,VueRouter,openAccountRouter,offlineDepositRouter,offlineWithdrawRouter,transactionListRouter,memberSessionService,memberService,dict) {
+require(["vue","vue-router","router/open-account","router/offline-deposit"
+        ,"router/offline-withdraw","router/transaction-list","service/member-session"
+        ,"dict","bootstrap"],
+function(Vue,VueRouter,openAccountRouter,offlineDepositRouter
+         ,offlineWithdrawRouter,transactionListRouter,memberSessionService,dict) {
 
     Vue.use(VueRouter);
 
@@ -35,18 +38,12 @@ function(Vue,VueRouter,openAccountRouter,offlineDepositRouter,offlineWithdrawRou
                 location.reload();
             }
         },mounted:function () {
-                memberSessionService.memberSession.then(function (value) {
+                memberSessionService.findOne({token:$.cookie("token")}).then(function (value) {
                     app.token = value.data.token;
+                    app.profile = value.data;
                 }).catch(function (reason) {
                     location.href = "/login.html";
                 });
-
-                memberService.getFrontMember().then(function (res) {
-                    app.profile = res.data;
-                });
-
-
-
             }
     }).$mount("#app");
 

@@ -11,10 +11,12 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,8 +46,14 @@ public class HandlerRoleInterceptor implements HandlerInterceptor {
             addHandlerMapping(handler);
             ret = preHandle(request,response,handler);
         }else if(hasValidate){
-            String token = request.getParameter("token");
-
+            String token = null;
+            Cookie[] cookies = request.getCookies();
+            for(Cookie cookie : cookies){
+                if(cookie.getName().equals("token")){
+                    token = cookie.getValue();
+                    break;
+                }
+            }
 
             if(!StringUtils.isEmpty(token)){
                 HandlerRole handlerRole = handlerRoleMapping.get(handler);

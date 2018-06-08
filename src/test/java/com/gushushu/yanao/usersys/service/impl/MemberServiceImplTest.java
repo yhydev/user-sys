@@ -72,6 +72,7 @@ public class MemberServiceImplTest {
 
 
 
+/*
 
     @Test
     public void frontMember(){
@@ -79,6 +80,7 @@ public class MemberServiceImplTest {
         memberService.getFrontMember(token);
 
     }
+*/
 
 
 

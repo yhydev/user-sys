@@ -28,26 +28,23 @@ define(["jquery","service/member-session","Promise"],function ($,memberSessionSe
     function list(data) {
 
         return new Promise(function (resole,reject) {
-            memberSessionService.memberSession.then(function (value) {
-                data.token = value.data.token;
-                $.ajax({
-                    success:function (res) {
-                        if(res.success){
-                            resole(res)
-                        }else{
-                            reject(res)
-                        }
-                    },
-                    error:reject,
-                    data:$.param(data),
-                    url:"/transaction"
-                })
+            $.ajax({
+                success:function (res) {
+                    if(res.success){
+                        resole(res)
+                    }else{
+                        reject(res)
+                    }
+                },
+                error:reject,
+                data:$.param(data),
+                url:"/transaction/findList"
             })
         });
     }
 
     return {
-        list:list,
+        findList:list,
         update:update
     };
 })
