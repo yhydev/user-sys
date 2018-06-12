@@ -1,22 +1,9 @@
 
 
-require(["jquery","service/member-session","jquery-form","jquery-validator"],function($,sessionService){
+require(["jquery","common/auto-login","jquery-form","jquery-validator"],function($){
 
 
     $(document).ready(function () {
-
-        var pages ={
-            manager:"/manager_index.html",
-            user:"/index.html"
-        }
-
-        sessionService.findOne({token:$.cookie("token")}).then(function (value) {
-            var page = pages[value.data.type];
-            if(page){
-                location.href = page;
-            }
-        }).catch(function (reason) {  })
-
 
         // 在键盘按下并释放及提交后验证提交表单
         $("#login-box").validate({
@@ -55,7 +42,7 @@ require(["jquery","service/member-session","jquery-form","jquery-validator"],fun
                             alert(res.message);
                         }
                     },error:function(){
-
+                        alert("未知错误，请联系客服");
                     }
                 });
             }

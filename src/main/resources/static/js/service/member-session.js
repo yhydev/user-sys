@@ -1,7 +1,7 @@
 define(["Promise","jquery"],function (Promise,$) {
 
 
-    this.findOne = function (data) {
+    var findOne = function (data) {
         return new Promise(function (resolove,reject) {
             $.ajax({
                 data:data,
@@ -18,7 +18,9 @@ define(["Promise","jquery"],function (Promise,$) {
         })
     };
 
-    return this;
+    return {
+        findOne:findOne
+    };
 })
 
 

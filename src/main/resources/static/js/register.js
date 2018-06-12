@@ -4,15 +4,25 @@ require.config()
 
 
 
-require(["jquery","jquery-form","jquery-validator","image-code","phone-auth","session"],function($){
+require(["jquery","common/auto-login","jquery-form","jquery-validator","jquery-cookie","phone-auth"],function($){
 
     $(document).ready(function () {
+        var imgCodeEle =  $(".image-code-box .code-img");
+        imgCodeEle.click(function(){
+            this.src = this.src;
+        })
 
-        function toIndex() {
-            location.href = "index.html";
+
+        function getUrlParam(name)
+        {
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r!=null) return unescape(r[2]); return null; //返回参数值
         }
 
-        $.autoLogin(toIndex);
+
+        $("[name=proxyId]").val(getUrlParam("proxyId"))
+
 
 
         $("#phoneAuthSent").phoneAuth(function(success,fail){
@@ -25,6 +35,7 @@ require(["jquery","jquery-form","jquery-validator","image-code","phone-auth","se
                     if(res.success){
                         success()
                     }else{
+                        imgCodeEle.click();
                         fail()
                         alert(res.message)
                     }
@@ -75,12 +86,15 @@ require(["jquery","jquery-form","jquery-validator","image-code","phone-auth","se
                 $(form).ajaxSubmit({
                     success:function(res){
                         if(res.success){
-                            $.tokenLogin(res.data.token,toIndex);
+                            $.cookie("token",res.data.token,{expired:7})
+                            location.reload()
                         }else{
+                            imgCodeEle.click();
                             alert(res.message);
                         }
                     },error:function(){
-
+                        imgCodeEle.click();
+                        alert("未知错误，请联系管理员")
                     }
                 });
             }

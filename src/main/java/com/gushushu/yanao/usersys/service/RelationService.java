@@ -1,6 +1,7 @@
 package com.gushushu.yanao.usersys.service;
 
 
+import com.gushushu.yanao.usersys.common.PageParam;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.model.BackMember;
@@ -18,7 +19,7 @@ public interface RelationService {
 
     ResponseEntity<ResponseBody> create(CreateParam createParam);
 
-    ResponseEntity<ResponseBody<QueryData<BackMember>>> find(String proxyMemberId);
+    ResponseEntity<ResponseBody<QueryData<BackMember>>> find(String proxyMemberId, PageParam page);
 
 
 
