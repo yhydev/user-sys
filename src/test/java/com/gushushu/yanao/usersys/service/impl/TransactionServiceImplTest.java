@@ -2,15 +2,10 @@ package com.gushushu.yanao.usersys.service.impl;
 
 import com.gushushu.yanao.usersys.Application;
 import com.gushushu.yanao.usersys.common.ResponseBody;
-import com.gushushu.yanao.usersys.config.AppConstant;
-import com.gushushu.yanao.usersys.entity.Transaction;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
-import com.gushushu.yanao.usersys.model.FrontTransaction;
-import com.gushushu.yanao.usersys.repository.OfflinePayRepository;
 import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.TransactionService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @SpringBootTest(classes = Application.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TransactionServiceImplTest implements AppConstant{
+public class TransactionServiceImplTest{
 
     @Autowired
     private TransactionService transactionService;

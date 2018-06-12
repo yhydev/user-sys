@@ -94,7 +94,7 @@ public class MemberServiceImpl implements MemberService {
             member.setApplyForOpenAccountDate(new Date());
             member.setInnerDiscAccount(setInnerDiscAccountParam.getInnerDiscAccount());
             member.setOpenAccountStatus(MemberOpenAccountStatus.OPEN_ACCOUNT);
-
+            member.setSetInnerDiscDate(new Date());
             memberRepository.save(member);
 
             response = ResponseEntityBuilder.success(member.getMemberId());

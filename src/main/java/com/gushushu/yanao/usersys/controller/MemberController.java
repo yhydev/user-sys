@@ -31,12 +31,11 @@ public class MemberController {
 
 
 
-/*
-    @GetMapping("/{memberId}")
+    @GetMapping("/findOne")
     @HandlerRole({MemberType.MANAGER_TYPE})
-    public ResponseEntity get(@PathVariable("memberId") String memberId){
+    public ResponseEntity findOne(String memberId){
         return memberService.findOne(memberId);
-    }*/
+    }
 
 
 

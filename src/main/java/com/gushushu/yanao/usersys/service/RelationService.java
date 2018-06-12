@@ -2,6 +2,9 @@ package com.gushushu.yanao.usersys.service;
 
 
 import com.gushushu.yanao.usersys.common.ResponseBody;
+import com.gushushu.yanao.usersys.entity.Member;
+import com.gushushu.yanao.usersys.model.BackMember;
+import com.gushushu.yanao.usersys.model.QueryData;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,8 @@ public interface RelationService {
 
 
     ResponseEntity<ResponseBody> create(CreateParam createParam);
+
+    ResponseEntity<ResponseBody<QueryData<BackMember>>> find(String proxyMemberId);
 
 
 

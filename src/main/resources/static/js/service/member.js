@@ -1,6 +1,6 @@
-define(["Promise","jquery","service/member-session"],function (Promise,$,memberSessionService) {
+define(["Promise","jquery"],function (Promise,$) {
 
-    this.rejectOpenAccount = function (data) {
+    var rejectOpenAccount = function (data) {
         return new Promise(function (resolve,reject) {
                     $.ajax({
                         data:data,
@@ -18,7 +18,7 @@ define(["Promise","jquery","service/member-session"],function (Promise,$,memberS
     }
 
 
-    this.findList = function (data) {
+    var findList = function (data) {
         return new Promise(function (resolve,reject) {
                     $.ajax({
                     data:data,
@@ -36,8 +36,26 @@ define(["Promise","jquery","service/member-session"],function (Promise,$,memberS
             })
     }
 
+    var findOne = function (data) {
+        return new Promise(function (resolove,reject) {
+            $.ajax({
+                data:data,
+                url:"/member/findOne",
+                success:function (res) {
+                    if(res.success){
+                        resolove(res)
+                    }else{
+                        reject(res)
+                    }
+                },
+                error:reject
+            })
+        })
+    };
+
     return {
         findList:findList,
-        rejectOpenAccount:rejectOpenAccount
+        rejectOpenAccount:rejectOpenAccount,
+        findOne:findOne
     };
 })

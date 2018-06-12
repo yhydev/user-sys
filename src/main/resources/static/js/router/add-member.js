@@ -18,12 +18,12 @@ define(["jquery","component/widget","jquery-form","validator-utils","jquery-vali
             },messages:{
                 account:{
                     required:"请输入手机号",
-                    phone:true
+                    phone:"手机号格式不正确",
 
                 },
                 password:{
                     required:"请输入密码",
-                    minlength:6
+                    minlength:"密码最低为 6 位字符",
                 },type:{
                     required:"请选择用户类型"
                 }

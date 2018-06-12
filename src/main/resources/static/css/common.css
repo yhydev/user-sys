@@ -127,6 +127,6 @@ label.error{
 }
 
 
-[v-clock]{
+[v-clock],.v-clock{
     display: none!important;
 }

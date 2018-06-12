@@ -9,6 +9,11 @@ define(function () {
             wait_check:"wait_check",
             success:"success",
             failed:"success"
+        },memberType:{
+            user:'user',
+            manager:'proxy',
+            proxy:'proxy'
+
         }
     }
 })

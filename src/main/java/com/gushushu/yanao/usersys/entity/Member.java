@@ -1,5 +1,7 @@
 package com.gushushu.yanao.usersys.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gushushu.yanao.usersys.serialize.DateSerialize;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,6 +16,7 @@ public class Member {
     private String memberId;
     private String account;//账户 (手机号)
     private String password;//密码
+    @JsonSerialize(using = DateSerialize.class)
     private Date createDate;// 创建日期
     private String type;//类型
     private String status;//状态 未启动

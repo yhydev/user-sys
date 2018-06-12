@@ -29,6 +29,15 @@ public class BackMember {
     private Date setInnerDiscDate;//设置内盘账户日期
 
 */
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getMemberId() {
         return memberId;
     }

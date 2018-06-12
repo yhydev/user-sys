@@ -37,6 +37,8 @@ public interface MemberService {
 
     String findMemberId(String account, String password);
 
+    ResponseEntity<ResponseBody<Member>> findOne(String memberId);
+
 
 
 

@@ -1,28 +1,20 @@
 package com.gushushu.yanao.usersys.service.impl;
 
-import com.gushushu.yanao.usersys.common.RandomUtils;
 import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
-import com.gushushu.yanao.usersys.config.AppConstant;
 import com.gushushu.yanao.usersys.entity.IdentifyingCode;
 import com.gushushu.yanao.usersys.repository.IdentifyingCodeRepository;
 import com.gushushu.yanao.usersys.service.IdentifyingCodeService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Properties;
-import java.util.Random;
 
 @Service
-public class IdentifyingCodeServiceImpl implements IdentifyingCodeService,AppConstant {
+public class IdentifyingCodeServiceImpl implements IdentifyingCodeService {
 
     final static Logger logger = Logger.getLogger(IdentifyingCodeServiceImpl.class);
 
