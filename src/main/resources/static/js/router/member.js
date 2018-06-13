@@ -8,10 +8,7 @@ define(["service/member","filter/app-dict"],function (memberService) {
                        
                         <div class="col-md-6">
                             <label>账号：</label>
-                            <span>{{data.account}}
-                             <a v-if="data.openAccountStatus == dict.openAccountStatus.applyForAccount" href="javascript:;" v-on:click="rejectOpenAccount(data.memberId)">拒绝开户</a>
-                            <router-link  v-if="data.openAccountStatus == dict.openAccountStatus.applyForAccount"  :to="{path:'/set-inner-disc-account',query:{memberId:data.memberId}}">为他开户</router-link>
-                            <router-link  v-if="data.type == dict.memberType.proxy"  :to="{path:'/set-inner-disc-account',query:{memberId:data.memberId}}">子用户</router-link></span>
+                            <span>{{data.account}}</span>
                         </div>
                         
                         <div class="col-md-6">
@@ -30,7 +27,21 @@ define(["service/member","filter/app-dict"],function (memberService) {
                             <label>交易状态：</label>
                             <span>{{data.openAccountStatus|app_dict}}</span>
                         </div>
+                        
+                         <div class="col-md-6">
+                            <label>交易状态：</label>
+                            <span>
+                                <a v-if="data.openAccountStatus == dict.openAccountStatus.applyForAccount" href="javascript:;" v-on:click="rejectOpenAccount(data.memberId)">拒绝开户</a>
+                                <router-link  v-if="data.openAccountStatus == dict.openAccountStatus.applyForAccount"  :to="{path:'/set-inner-disc-account',query:{memberId:data.memberId}}">为他开户</router-link>
+                                <router-link  v-if="data.type == dict.memberType.proxy"  :to="{path:'/member-list',query:{proxyId:data.memberId}}">子用户</router-link></span>
+                                <router-link    :to="{path:'/manager-transactions',query:{memberId:data.memberId}}">他的交易</router-link>
+                                
+                            </span>
+                        </div>
 
+
+
+                             
                         
                         </div>
                         <div v-clock  class="row">

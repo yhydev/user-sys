@@ -5,6 +5,8 @@ import com.gushushu.yanao.usersys.common.ResponseBody;
 import com.gushushu.yanao.usersys.common.ResponseEntityBuilder;
 import com.gushushu.yanao.usersys.entity.Member;
 import com.gushushu.yanao.usersys.entity.QMember;
+import com.gushushu.yanao.usersys.entity.QRelation;
+import com.gushushu.yanao.usersys.model.BackMember;
 import com.gushushu.yanao.usersys.model.FrontMemberSession;
 import com.gushushu.yanao.usersys.model.QueryData;
 import com.gushushu.yanao.usersys.repository.MemberRepository;
@@ -12,7 +14,9 @@ import com.gushushu.yanao.usersys.service.MemberService;
 import com.gushushu.yanao.usersys.service.MemberSessionService;
 import com.gushushu.yanao.usersys.service.RelationService;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.support.QueryBase;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import org.apache.log4j.Logger;
@@ -222,13 +226,22 @@ public class MemberServiceImpl implements MemberService {
         Predicate[] predicateArray = new Predicate[predicates.size()];
         predicates.toArray(predicateArray);
 
-        QueryResults<T> queryResults = jpaQueryFactory.select(searchParam.getResultBean())
-                .from(member)
+        JPAQuery<T> queryBase = jpaQueryFactory.select(searchParam.getResultBean())
+                .from(member);
+
+        //添加代理条件
+        if(!StringUtils.isEmpty(searchParam.getProxyId())){
+            queryBase.join(QRelation.relation).on(QRelation.relation.proxyMember.memberId.eq(searchParam.getProxyId())).
+                    on(member.memberId.eq(QRelation.relation.member.memberId));
+        }
+
+        QueryResults queryResults = queryBase
                 .where(predicateArray)
                 .offset(searchParam.getSize() * searchParam.getPage())
                 .limit(searchParam.getSize())
                 .orderBy(member.memberId.asc())
                 .fetchResults();
+
         QueryData<T> queryData = new QueryData<T>(queryResults.getResults()
                 ,searchParam.getPage(),searchParam.getSize(),queryResults.getTotal());
         response = ResponseEntityBuilder.<QueryData<T>>success(queryData);

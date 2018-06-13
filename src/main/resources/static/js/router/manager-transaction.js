@@ -86,8 +86,7 @@ define(["service/transaction","filter/app-dict"],function (transactionService) {
         },mounted:function () {
             var vue = this;
             this.$route.query.token = vue.token;
-            console.log(this.$route.query)
-            transactionService.findList(this.$route.query).then(function (value) {
+            transactionService.findOne(this.$route.query).then(function (value) {
                 vue.data = value.data
             }).catch(function (reason) {
                 alert(reason.message)

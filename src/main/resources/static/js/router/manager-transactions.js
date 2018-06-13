@@ -4,7 +4,7 @@ define(["service/transaction","component/router","filter/app-dict"],
         template:`
         
         <router-template>
-        <h1 slot="title">交易列表</h1>
+        <h3 slot="title">交易列表<!--&nbsp;<small>{{title}}</small>--></h3>
         <div slot="content">
                 <div class="row col-md-12">
                     <div>

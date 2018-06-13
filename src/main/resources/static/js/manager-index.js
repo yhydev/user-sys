@@ -38,7 +38,7 @@ define(["vue","vue-router","router/add-member","router/manager-transaction","rou
         },mounted:function () {
 
             var vue = this;
-            memberSessionService.findOne({token:$.cookie("token")}).then(function (value) {
+            memberSessionService.findOne().then(function (value) {
                 vue.token = value.data.token;
                 vue.profile = value.data;
             }).catch(function (reason) {

@@ -230,6 +230,7 @@ public interface MemberService {
         private String openAccountStatus;
         private String type;
         private QBean<ResultBean> resultBean;
+        private String proxyId;
 
         @Override
         public String toString() {
@@ -237,7 +238,16 @@ public interface MemberService {
                     "openAccountStatus='" + openAccountStatus + '\'' +
                     ", type='" + type + '\'' +
                     ", resultBean=" + resultBean +
+                    ", proxyId='" + proxyId + '\'' +
                     "} " + super.toString();
+        }
+
+        public String getProxyId() {
+            return proxyId;
+        }
+
+        public void setProxyId(String proxyId) {
+            this.proxyId = proxyId;
         }
 
         public String getType() {

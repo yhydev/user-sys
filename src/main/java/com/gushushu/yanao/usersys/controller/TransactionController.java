@@ -40,7 +40,7 @@ public class TransactionController {
     }
 
     @HandlerRole({MemberType.USER_TYPE,MemberType.MANAGER_TYPE})
-    @GetMapping(params = {"transactionId"})
+    @GetMapping("/findOne")
     public ResponseEntity transaction(String transactionId){
         return transactionService.detail(transactionId);
     }

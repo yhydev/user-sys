@@ -43,8 +43,27 @@ define(["jquery","service/member-session","Promise"],function ($,memberSessionSe
         });
     }
 
+    function findOne(data) {
+
+        return new Promise(function (resole,reject) {
+            $.ajax({
+                success:function (res) {
+                    if(res.success){
+                        resole(res)
+                    }else{
+                        reject(res)
+                    }
+                },
+                error:reject,
+                data:$.param(data),
+                url:"/transaction/findOne"
+            })
+        });
+    }
+
     return {
         findList:list,
-        update:update
+        update:update,
+        findOne:findOne
     };
 })
