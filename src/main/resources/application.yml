@@ -2,9 +2,3 @@ spring:
   profiles:
     active: dev
 
-oss:
-  endpoint: oss-cn-shanghai.aliyuncs.com
-  accessKeyId: LTAIAsvQsM7aHc2J
-  accessKeySecret: anWNspis8C6v9YALQ1zOjl0sGfOsSz
-  directory: carId/
-  bucketName: wyd-dev
